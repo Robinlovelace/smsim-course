@@ -1,0 +1,34 @@
+---
+layout: base
+itemtype: http://schema.org/WebPage
+---
+<div class="row">
+  <div class="sidebar span4">
+ 
+<div class="row">
+  <div class="sidebar span4">
+    <ul class="nav nav-list">
+      <li> <a href="/basics.html">Msim basics</a></li>
+      <li> <a href="/literature">Literature</a></li>
+      <li> <a href="/practicals">Practicals</a></li>
+      <li> <a href="/code">Code</a></li>
+      <li> <a href="/data">Data</a></li>
+      <li> <a href="/further">Further study</a></li>
+    </ul>
+    <img src="/img/msim-schema.png">
+  </div>
+  </div>
+  </div>
+
+  <div class="content span8">
+    <h2>About</h2>
+    {{ content }}
+ 
+    <h2>Organizers</h2>
+    <ul class="thumbnails">
+    {% for user in site.data.course.organizers %}
+      <li class="span2"><a href="{{ user.url }}"><img class="usr-image thumbnail" src="{{ user.image }}" alt="{{ user.name }}"></a></li>
+    {% endfor %}
+    </ul>
+  </div>
+</div>
