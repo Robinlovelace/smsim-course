@@ -16,17 +16,27 @@ To reiterate and expand on this information, the agenda is as follows.
 - Introduction to Spatial Microsimulation: theory and applications
  - What is spatial microsimulation
  - What can it do: current and potential applications
+ - Worked example with pen and paper
+
+- R: a giant general purpose statistical calculator
+ - Loading the input data
+ (filter the dataset beforehand with R)
+ - Proportional fitting in R
 
 **Lunch**
 
-- R: a giant general purpose statistical calculator
- - Basic statistical procedures in R relevant to spatial microsimulation
- - An introduction to geographical data in R
- - Modelling in R
-- The internals of ‘population synthesis’, reweighting and input/outputs data
-- Integerisation: from fractional weights to whole samples
+ > - Basic statistical procedures in R relevant to spatial microsimulation
+ > - An introduction to geographical data in R
+- A worked example
+ - Loading the data (without modifying the source)
+ - Preparing the input data
+ - Model checking
 
-## Day 2: Applications
+  > - Modelling in R
+> - The internals of ‘population synthesis’, reweighting and input/outputs data
+> - Integerisation: from fractional weights to whole samples
+
+> ## Day 2: Applications
 
 - Processing and analysis of spatial microdata
 - Extensions to the basic model
