@@ -11,9 +11,12 @@ adhs <- adhs[c("NCakes", # how often eats cakes?
 #                3 1-2 times a week
 #                4 Less than once a week
 #                5 Rarely or never   
+
                "Car", # owns a car? 1 = yes, 2 = no
+
                "Sex", # gender: male = 1
-               "NSSEC8", # social class:
+
+               "NSSEC8", # social class: 1.1, 1.2 (higher managerial)
 #                 2 Lower managerial and professional occupations
 #                  3 Intermediate occupations
 #                  4 Small employers and own account workers

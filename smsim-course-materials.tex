@@ -1,9 +1,9 @@
 \documentclass[a4paper, 11pt, twoside]{article}  % Based on the ECS Thesis style
-\usepackage{graphicx}
+% \usepackage{graphicx}
 \usepackage{makeidx}
-\graphicspath{Figures/}  % Location of the graphics files
+\usepackage{graphicx}
+\graphicspath{{figures/}}  % Location of the graphics files
 \usepackage{multirow}
-\usepackage{threeparttable}
 % Making R code work!
 \usepackage{listings}
 \usepackage{color}
@@ -49,7 +49,7 @@
 \usepackage{wallpaper}
 \usepackage{cases}
 \makeindex
-\renewcommand{\includegraphics}[2][]{\fbox{#2}} %omits images
+% \renewcommand{\includegraphics}[2][]{\fbox{#2}} %omits images
 \begin{document}
  
 \title{An introduction to spatial microsimulation with R}
@@ -58,36 +58,76 @@
 \author{Lovelace, Robin\\
 \texttt{r.lovelace@leeds.ac.uk}}
 \maketitle
-\section{Introduction} 
 
-\section{Building a spatial microsimulation model in R} \label{setsim}
+\section{Introduction}
 
-Computer hardware has long influenced, and even
-\emph{determined} the types of analysis that can be conducted at the individual
-level. Hardware limitations are far less of a constraint than they used to be,
-elevating the importance of software. As \citet{Holm1987} made clear more than
-20 years ago,
-% in a section entitled `programming languages',
-the choice of software also
-has a major impact on the model's flexibility, efficiency, reproducibility and
-ease of coding. It was noted that ``little attention is paid to the
-choice of programming language used'' \citep[p.~153]{Holm1987}, an observation
-that appears to be as true now as it was then. % Search for languages? no.???
-For this research, a conscious decision was made early on to use R, and this
-has had an impact on the model construction, features, analysis and even design
-philosophy. It is at this stage, therefore, that R as a platform for undertaking
-spatial microsimulation is discussed in some detail. The theory is discussed in
-\cref{s:theory}
+This booklet was written to accompany a two day course of the same title.
+As well as providing useful information to the $\approx$30 participants during
+and after the course, it is hoped that the material will be of use to others.
+Spatial microsimulation is shrouded by an unnecessary mystery, and this is not
+helped by the fact that most academic papers on subject and even many textbooks
+on the subject are devoid of reproducible examples. In today's age of fast
+internet connections, open access datasets and free software, this is an
+abomination, damaging to the growth and credibility of the field.
 
-\subsection{Why R?}
-The majority of the quantitative analysis conducted for this thesis, and the
-entirety of the spatial microsimulation model used, was written in R. This was
-a deliberate choice made at the outset rather than an arbitrary decision based
-on predecessors. This section briefly explains the importance of choosing
-appropriate computer software in academic research in general, with respect to
-reproducibility, a cornerstone of science. The choice of R in particular is then
-described. R was chosen for its virtues, which are summarised well in
-\citet{Matloff-R}:
+To those doubting the value of this practical approach, I ask the following
+questions: If only a small community of researchers hold the majority of the
+code needed to perform spatial microsimulation, how can the technique spread
+rapidly to other applications? If every PhD student undertaking spatial
+microsimulation must start from scratch, how are the methods going to be
+refined and improved in a systematic fashion? Most importantly, if the results
+of most spatial microsimulation research is not reproducible --- as is currently
+the case --- how can we trust them?
+
+This final point is critical not only to spatial microsimulation but the
+disciplines of which it is part. Reproducibility is a prerequisite of
+falsifiability --- if the method
+underlying a result cannot be replicated by others, how can the finding
+possibly be falsified? Moreover, the argument continues, any knowledge or
+theory can only claim to enter the realm of `science' if it cannot be falsified.
+Because it is impossible to prove any proposition in every and all cases, the
+only reliable test we can apply is whether or not it can be \emph{disproved}:
+falsified via a contradictory finding. This is how scientific progress is made
+\citep{Popper1959}. By writing non-reproducible research, researchers may
+inadvertently damage the disciplines in which they work. %. how???
+
+Despite and because of these philosophical antecedents, the course is
+unashamedly practical. The aim is simple: to provide an accessible yet
+deep foundation in spatial microsimulation. This involves both
+\emph{understanding} and \emph{implementation} of the technique.
+Following the `learning by doing' ethic, the former can best be
+attained through the latter: spatial microsimulation need not be an abstract
+process that one simply reads about. It can be practical tool used by anyone
+with the know-how. As \citet[xxii]{kabacoff2011r} put it regarding R, ``the best
+way to learn is to experiment'' and the same applies to spatial microsimulation.
+
+The examples presented below were developed during a PhD project in the energy
+costs of commuting. Although some of the code and most of the descriptive text
+has been rewritten since then, many of the ideas and methods are described in
+more detail in the resulting thesis.% \citep{Lovelace2014-thesis}.
+
+\section{Why R?} \label{setsim} % Move this to just before R implementation?
+
+Software decisions have a major impact on the model's flexibility, efficiency,
+reproducibility and
+ease of coding. \citet[p.~153]{Holm1987} observed that ``little attention is
+paid to the choice of programming language used.''
+This appears to be as true now as it was then: software is rarely discussed in
+spatial microsimulation papers. 
+In my own spatial microsimulation research, a conscious decision was made early
+on to use R, with impacts on model features, analysis
+and even design. It is thus worth understanding the tool a little before we
+begin to use it. The theory is discussed in \cref{s:theory}
+
+% \subsection{Why R?}
+The world is awash with computer programming languages and many of these
+are general purpose and `Turing complete', meaning they could, with sufficient
+effort, perform spatial microsimulation. So why would one chose R?
+The most important criteria of evaluation include flexibility,
+speed of processing and, most importantly, ease and speed of writing code.
+R excels in each of these areas, especially the final one: it
+is possible to say a lot in R in few lines of code. Further
+are provided by \citet{Matloff-R}:
 
 \begin{itemize}
 \item ``a public-domain implementation of the widely-regarded S statistical
@@ -104,100 +144,24 @@ each time
 \item open-software nature means it’s easy to get help from the user
 community''
 \end{itemize}
+% Add in disadvantages here.
 
-\citet{Matloff-R} also provides five
-examples of the type of people who would be interested in programming in R,
-rather than using it as a quick and easy tool for graphing and numerical
-analysis. Of particular relevance to this thesis is the second of Matloff's 
-categories of people for whom R is recommended:
-``Academic researchers developing statistical methodology that is either new or
-combines existing methods into an integrated procedure that needs to be codified
-for usage by the general research community'' \citep[p.~xiii]{Matloff-R}.
-
-The quote also suggests some of the potential advantages of writing multi-use
-scripts in R rather than a collection of unrelated functions: by its
-very nature modelling is an iterative exercise, so it is important to be able
-to invoke specific chunks of code (e.g.~using the \verb source() ~command) that
-are modular. While this capability is not unique to R, the range of statistical functions that
-can be performed within a unified environment is. The
-rapidly growing use of R for spatial data analysis was another factor that
-makes it well-suited to spatial-microsimulation and other types of geographic
-modelling (e.g.~\citealp{Singleton2013-school}). R overcomes the need to switch
-between several different programs (e.g.~one for analysis, one for graphing,
-one for mapping), increasing simplicity and (eventually) productivity.
-
-Despite all these advantages, R has a number of weaknesses itemised below along with techniques and projects which mitigate them:
-\begin{itemize}
- \item R loads everything into RAM. This can be problematic when querying
- large datasets, of which only one part needs to be accessed at a
- time.\footnote{ This is especially common with geographical analysis, which often focus
- on a small area of a large map at a time \citep{Obe2011}.
- }
- There are numerous tools
- that overcome this constraint by querying databases (stored on the hard-disk) from within R, including
- RMySQL \citep{james2012rmysql} and Rattle \citep{Williams2009}. \citet{Singleton2013-school}
- queried a PostGIS database from within R to estimate the route taken by school
- commuters, for the estimation of associated CO$_2$ emissions.
- \item R can be slow, for example running for loops and when used as a general programming
- language which is not R’s main purpose. R being an
- interpreted language there are times when the performance advantages of a compiled language such as 
- C/C++ are needed.
- To this end the RCPP package was developed, which provides
- ``Seamless R and C++ integration''  \citep{eddelbuettel2011rcpp}. Packages are also available
- to integrate R with Java (rJava), Python (rpy2) and text markup languages such as Markdown and
- \LaTeX (knitr). Also, the base installation of R provides an inbuilt C compiler for doing the
- `heavy lifting' tasks such as kernel density estimation \citep{peng2002introduction}.
- These links to other languages could be useful for porting pre-existing algorithms
- for spatial microsimulation into R (e.g.~\citealp{Williamson2007, Ballas2007simb}).
- \item R's base graphics are unattractive and unintuitive. This problem has been
- tackled most comprehensively in a PhD thesis by Hadley Wickham \citep{Wickham2008}.
- The aim was to implement the `grammar of graphics' \citep{wilkinson2005grammar},
- a comprehensive and coherent approach to data visualisation, into an existing
- open-source statistical programming language. The result is ggplot2,
- which has a very active user and developer community \citep{wickham2011ggplot2}.
- ggplot2 has been used throughout this thesis for plotting with help from key
- references \citep{wickham2011ggplot2, chang2012r}.
- \item R's visualisations are not dynamic. This problem has been partly
- overcome in the realm  of GIS with two QGIS plugins: ManageR and Home range.
- For dynamic web applications, the R package Shiny provides similar interactive
- functionality as Google's Fusion tables project. There is also a nascent
- interface between R and Processing (rprocessing), an abstraction of Java
- ideal for dynamic
- visualisations of geographic data (e.g.~\citealp{wood2010visualisation}).
-\end{itemize}
-
-\subsection{IPF theory: a worked example} \label{s:theory}
-In most modelling texts there is a strong precedence of theory over
-application: the latter usually flows from the former. The location 
-of this section after a description of the programming language
-R is therefore a little unconventional but there is a logic to this order. 
-Having demonstrated the power and flexibility of the programming language in
-which the model is written, the next stage is to analyse the task to which it
-is to be set. More importantly for reproducible research, this theory section
-is illustrated with a simple worked example that culminates in
-a question to the reader, to test his or her understanding.
-
+\section{IPF theory: a worked example} \label{s:theory}
 IPF is a simple statistical procedure, ``in which cell counts in a contingency
 table containing the sample observations are scaled to be consistent with
 various externally given population marginals'' \citep{mcfadden2006testing}. In
 other words, and in the context of \emph{spatial} microsimulation, IPF produces
 maximum likelihood estimates for the frequency with which people appear in
 different areas. The method is also known as `matrix raking' or the RAS
-algorithm, (\citealp{Birkin1988, Muller2010,
-Simpson2005, Kalantari2008, Jirousek1995}) and has been described as one
+algorithm,
+% (\citealp{Lovelace2014-ipf})
+and has been described as one
 particular instance of a more general procedure of `entropy maximisation'
-\citep{Johnston1993, blien1998entropy}.
+\citep{Johnston1993}.
 The mathematical properties of IPF
-have been described in several papers
-(\citealp{Bishop1975, Fienberg1970, Birkin1988}).
-Illustrative examples of the procedure can be found in
-\citet{Saito1992}, \citet{Wong1992}
-and \citet{Norman1999a}. \citet{Wong1992} investigated the reliability of IPF
-and evaluated the importance of different factors influencing the its
-performance. Similar methodologies have since been employed by
-\citet{Mitchell2000}, \citet{Williamson2002} and
-Ballas et al.~\citeyearpar{Ballas2005c, Ballas2005}
-to investigate a wide range of phenomena.
+are described in earlier papers (e.g.~\citealp{Fienberg1970}).
+A practical example of the procedure can be found in
+\citet{Norman1999a}, who provides an implementation in Microsoft Excel.
 
 % As \citet{Birkin1988} point out, IPF undertakes the basic task of
 % generating a vector of individual characteristics, $x = (x_1, x_2, ..., x_m)$ on the
@@ -268,25 +232,12 @@ to investigate a wide range of phenomena.
 % \citep{Birkin1988}. An extensive discussion of the mathematical properties of
 % IPF can be found in \citet{Fienberg1970}.
 
-To illustrate how IPF works in practice, a simplified example is described below.
-This is a modified version of a simpler demonstration from
-\citet{Ballas2005}.\footnote{In \citet{Ballas2005}
-the interaction between the age and sex constraints are assumed to be known.
-(Their equivalent of \cref{t:s2} contains data for every cell,
-not question marks.) This results in IPF converging instantly.
-However, in Census data, such cross-tabulation is
-often absent, and IPF must converge over multiple constraints and
-iterations. This latter scenario is assumed in the worked example below. Other
-worked examples of the principles are provided in \citet[Appendix
-3]{johnston1985geography} (for entropy maximisation), \citet{Norman1999a} and
-\citet{Simpson2005} (using the proprietary statistical software SPSS).
-}
+The simple example below demonstrates how IPF works.
 Table \ref{t:w}  describes a
 hypothetical microdataset comprising 5 individuals, who are defined by two
-constraint variables, age and sex. Each has two categories.
+constraint variables: age and sex. Each has two categories.
 Table \ref{t:s} contains aggregated data
-for a hypothetical area, as it would be downloaded from census dissemination
-portal Casweb. \Cref{t:s2} illustrates this table in a different form,
+for a hypothetical area. \Cref{t:s2} illustrates this table in a different form,
 which shows our ignorance of interaction between age and sex.
 
 
@@ -427,16 +378,20 @@ w(3)_{ij} = \frac{w(2)_{ij} \times sT_{j}}{mT(2)_{j}}
 
 To test your understanding of IPF, apply \cref{eq:ipf2} to the information above
 and that presented in \cref{t:m2}.
-This should result in the following vector of new weights, for individuals 1 to 5:
+This should result in the following vector of new weights, for individuals 1 to
+5. Calculate the correct values and pencil them in in place of the question
+marks. One `sanity' check of your method here is whether the sum of these
+weights is still equal to twelve. % Add online link to answers - tinyurl
+
 \begin{equation}
-%  w(3) = (\frac{6}{5}, \frac{?}{?}, \frac{18}{5}, \frac{?}{?}, \frac{9}{2})
-  w(3) = (\frac{6}{5}, \frac{6}{5}, \frac{18}{5}, \frac{3}{2}, \frac{9}{2})
+w(3) = (\frac{6}{5}, \frac{?}{?}, \frac{18}{5}, \frac{?}{?}, \frac{9}{2})
+% w(3) = (\frac{6}{5}, \frac{6}{5}, \frac{18}{5}, \frac{3}{2}, \frac{9}{2})
 \end{equation}
-As before, the sum of the weights is equal to the population of the area (12).
+
 Notice also that after each iteration the fit between the marginal
 totals of $m$ and $s$
-improves. The total absolute error (TAE, see \cref{etae} below)
-from $m(1)$ to $m(2)$ improves from
+improves. The total absolute error (TAE) improves
+between $m(1)$ to $m(2)$, falling from
 14 to 6 in \cref{t:m} and \cref{t:m2} above. TAE for $m(3)$ (not shown,
 but calculated by aggregating $w(3)$) improves even more, to 1.3.
 This number would eventually converge to 0 through subsequent
@@ -466,7 +421,7 @@ The above process, when applied to more categories (e.g. socio-economic class)
 and repeated iteratively until a satisfactory convergence occurs, results in a
 series of weighted microdatasets, one for each of the small areas being
 simulated. This allows for the estimation of variables whose values are not
-known at the local level (e.g. income) \citep{Ballas2005}. An issue
+known at the local level (e.g. income). An issue
 with the results of IPF (absent from combinatorial optimisation methods),
 however, is that it results in non-integer weights: fractions of individuals
 appear in simulated areas. As described in the introduction, this is not ideal
@@ -487,7 +442,7 @@ with the results of IPF (absent from combinatorial optimisation methods),
 however, is that it results in non-integer weights: fractions of individuals
 appear in simulated areas.
 
-\subsection{Implementing IPF in R} \label{simplementing}
+\section{Implementing IPF in R} \label{simplementing} % priority: automate!!!
 The above example is best undertaken by hand, probably with a pen and paper
 to gain an understanding of IPF, before the process is automated for 
 larger datasets. This section explains how the IPF
@@ -797,44 +752,12 @@ for model checking are the topic of the following section.
 
 \section{Model checking and validation} \label{smeval}
 
-The R scripts that implement the methods described in \cref{setsim} and
-\cref{s:integerisation} contain over 1000 lines of code.
-This means that making mistakes while writing the code was almost inevitable,
-from time to
-time.\footnote{
-A couple of examples serve to illustrate this point: during the construction of
-vulnerability metrics based on the individual level output from the spatial
-microsimulation model, the estimated expenditure on commuting was divided
-by equivalised household income (a proxy of disposable income). 
-One issue was that trip cost estimates are per year
-while the income estimates are supplied per month in the USd. It took several
-more alterations and runs of the model before the cause of the high proportion
-of income spent on commuting (sometimes over 100\%) was realised. Another
-example is simple typing errors while writing the code. The results are
-presented in \cref{fig:error}, and are described below.
-}
-The large size of
-the output files (approximately 250 Mb for 10 iterations of the spatial
-microsimulation model for Yorkshire and the Humber) means that it would
-be easy to miss fundamental errors. Hence the need for a
-systematic strategy of checking the output. Beyond checking the model's
-internal validity, it is necessary to test its external validity. This process,
-validation, is inherently limited by lack of real spatial microdata.
-Validation is a crucial step to take before the results are
-presented, discussed and used as the basis of policy guidance. To make an
-analogy with corporate food safety standards, it is important be open about and
-highlight times when things do go wrong, in order to achieve high standards
-\citep{Powell2011}. Transparency is needed in modelling for similar reasons
-\citep{Tamminga2012}. This section is therefore an overview of the methods used
-to find fault in the model, rather than assuming that everything is working
-perfectly as the rest of the thesis does. It is divided into two halves: first
-the process
-of comparing the model results with knowledge of how it \emph{should}
-perform \emph{a-priori} (model checking). Second, the
-internally consistent model results are compared with external
-empirical data (validation).
-Validation is also discussed in the context of a single case study
-in \cref{s:valid}.
+To make an analogy with food safety standards, openness about mistakes is
+conducive to high standards \citep{Powell2011}. Transparency in model
+verification is desirable for similar reasons. The two main strategies are 1) 
+comparing the model results with knowledge of how it \emph{should}
+perform \emph{a-priori} (model checking) and 2) comparison between the model
+results and empirical data (validation).
 
 \subsection{Model checking}
 A proven method of checking that data analysis and processing is working
@@ -1211,97 +1134,24 @@ whole individuals. Integerisation of the weight matrices is needed.
 
 
 \section{Integerisation} \index{integerisation}
+A question raised by this research is this: How do integerised IPF results
+compare with other (e.g. combinatorial optimisation) approaches to spatial
+microsimulation?
+Studies have compared non-integer results of IPF with
+alternative approaches \citep{harland2012}, but not like-with-like.
 
 \section{Extensions to the basic model}
 \label{discuss}
-The results show that TRS integerisation outperforms the other methods of
-integerisation tested in this section.
-At the aggregate level, accuracy
-improves in the following order: simple rounding,
-inclusion threshold, counter-weight, proportional probabilities and, most
-accurately, TRS. This order of preference remains unchanged, regardless of which
-(from a selection of 5) measure of goodness-of-fit is used. These results
-concur with a finding derived from theory --- that ``deterministic rounding of
-the counts is not a satisfactory integerization''
-\citep[p.~689]{Pritchard2012}.
-Proportional probability and TRS methods clearly provide more accurate
-alternatives.
 
-An additional advantage of the probabilistic TRS and proportional probability
-methods is that correct population sizes are guaranteed.\footnote{Although
-the counter-weight method produced the correct population sizes in our tests, it
-cannot be guaranteed to do so in all cases, because of its reliance on simple
-rounding: if more weights are rounded up than down, the population will be too
-high. However, it can be expected to yield the correct population in cases
-where the populations of the areas under investigation are substantially
-larger than the number of individuals in the survey dataset.}
-In terms of speed of calculation, TRS also performs well. TRS takes marginally
-more time than simple rounding and proportional probability methods,
-but is three times quicker than the threshold and counter-weight
-approaches. In practice, it seems that integerisation processing time is
-small relative to running IPF over several iterations. Another
-major benefit of these non-deterministic methods is that probability
-distributions of results can be generated, if the algorithms are run multiple
-times using unrelated pseudo-random numbers. Probabilistic methods could
-therefore enable the uncertainty introduced through integerisation to be
-investigated quantitatively
-\citep{Beckman1996, Rubin1987} and subsequently illustrated using error bars.
-
-Overall the results indicate that TRS is superior to the
-deterministic methods on many levels and introduces less error than the
-proportional probabilities approach.
-We cannot claim that TRS is `the best' integerisation strategy available though:
-there may be other solutions to the problem and different sets of test weights
-may generate different
-results.\footnote{Despite these caveats, the order of accuracy
-identified in this section is expected to hold in most cases.
-Supplementary Information (Section 4.4), shows the same order of
-accuracy (except the threshold method and counter-weight
-methods, which swap places) resulting from the integerisation of a
-different weight matrix.
-}
-The issue will still present a
-challenge for future researchers considering the use of IPF to generate sample
-populations composed of whole individuals: whether to use deterministic or
-probabilistic methods is still an open question (some may favour
-deterministic methods that avoid psuedo-random numbers, to ensure
-reproducibility regardless of the software used), and the question of whether
-combinatorial optimisation algorithms perform better has not been addressed.
-
-Our results provide insight into the advantages and disadvantages of
-five integerisation methods and guidance to researchers wishing to
-use IPF to generate integer weights: use
-TRS unless determinism is needed or until superior alternatives (e.g.~real small
-area microdata) become available. Based on the code and example datasets
-provided in the Supplementary Information, other are encouraged to use, build on
-and improve TRS integerisation.
-
-A broader issue raised by this research, that requires further
-investigation before answers emerge, is `how do the integerised results of IPF
-compare with combinatorial optimisation approaches to spatial microsimulation?'
-Studies have compared non-integer results of IPF with
-alternative approaches \citep{Smith2009, Ryan2009, Rahman2010, harland2012}.
-However, these have so far failed to compare like with like: the integer results
-of combinatorial approaches are more useful (applicable to more types of
-analysis) than the non-integer results of IPF. TRS thus offers a
-way of `levelling the playing field' whilst minimising the error introduced to
-the results of deterministic reweighting through integerisation.
-
-In conclusion, the integerisation methods presented in this section make
-integer results accessible to those with a working knowledge of IPF. TRS
-outperforms previously published methods of integerisation. As such, the
-technique offers an attractive alternative to combinatorial
-optimisation approaches for applications that
-require whole individuals to be simulated based on aggregate data.
+\section{Acknowledgements}
 
 \label{Bibliography}
 % \lhead{\emph{Bibliography}}  % Change the left side page header to
 % \fancyhead[LO,RE]{\emph{Bibliography}}
 \bibliographystyle{model2-names}  % Use the "unsrtnat" BibTeX style for
 % \bibliography{library, lincluded}  % The references (bibliography) information are stored
-\bibliography{/nfs/foe-fs-01_users/georl/Documents/Microsimulation,/home/robin/Documents/Microsimulation.bib}  % The
-% Replace w. link-pstar or link-ps depending
-
+\bibliography{/home/robin/Documents/Microsimulation.bib}  % The
+% /nfs/foe-fs-01_users/georl/Documents/Microsimulation,
 
 \addtocontents{toc}{\vspace{2em}}  % Add a gap in the Contents, for aesthetics
 
