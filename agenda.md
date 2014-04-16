@@ -3,6 +3,7 @@ layout: base
 Title: Agenda
 ---
 
+<!--todo: add times-->
 # Agenda
 
 The agenda for the 1.5 day spatial microsimulation course
@@ -25,16 +26,16 @@ To reiterate and expand on this information, the agenda is as follows.
 
 **Lunch**
 
- > - Basic statistical procedures in R relevant to spatial microsimulation
- > - An introduction to geographical data in R
+<!--- Basic statistical procedures in R relevant to spatial microsimulation-->
+<!--- An introduction to geographical data in R-->
 - A worked example
  - Loading the data (without modifying the source)
  - Preparing the input data
  - Model checking
 
-  > - Modelling in R
-> - The internals of ‘population synthesis’, reweighting and input/outputs data
-> - Integerisation: from fractional weights to whole samples
+<!--[>> - Modelling in R<]-->
+<!--[>> - The internals of ‘population synthesis’, reweighting and input/outputs data<]-->
+<!--[>> - Integerisation: from fractional weights to whole samples<]-->
 
 > ## Day 2: Applications
 
