@@ -76,100 +76,36 @@ Spatial microsimulation works by taking \emph{microdata} at the individual level
 and using aggregate-level constraints to allocate these individuals to zones.
 The two main methods are \emph{deterministic reweighting} and \emph{combinatorial optimisation}.
 This practical takes the former approach using a process called \emph{iterative proportional fitting}
-(IPF)
-via selective sampling or the allocation of weights ,Lovelace2013-trs}.
+(IPF). IPF is used to increase the weights of individuals who are representative
+of the target area and reduce the weights of individuals who are relatively
+rare \citep{Lovelace2013-trs}.
 The output is a \emph{spatial microdataset}.
-The main methods for achieving  process is visualised in conceptual terms in \cref{fsmsim-schema}.
+
+A schematic of the process is shown in \cref{fmsim-schema}.
+Take a look at the image and think about the process. But we don't want to get
+bogged down in theory or applications in this course: we want to `get our
+hands dirty'. In the next section we will do just that, by loading some
+example data.
 
 \begin{figure}
 \begin{center}
   \includegraphics[width=10cm]{msim-schema}
 \end{center}
-
 \caption{Schema of iterative proportional fitting (IPF) and combinatorial optimisation
 in the wider context of the availability of different data formats and spatial microsimulation. \label{fmsim-schema}}
 \end{figure}
 
 \section{Some input data} \label{s:theory}
 
-
-% As \citet{Birkin1988} point out, IPF undertakes the basic task of
-% generating a vector of individual characteristics, $x = (x_1, x_2, ..., x_m)$ on the
-% basis of a joint probability distribution $p(x)$. Once the probability distribution
-% for such a vector is generated, representative
-% individuals can be synthesised or extracted from a pre-existing survey dataset.
-% However, when information is not available for the full joint distribution, there
-% is a need to construct a product of conditional and marginal probabilities,
-% by building one attribute at a time, so that the probability of certain attributes
-% is conditionally dependent on existing attributes \citep{Birkin1988}:
-%
-% \begin{equation}
-% p(x) = p(x_1)p\left( \frac{x_2}{x_1}\right) p\left( \frac{x_3}{x_2}, x_1\right) \times
-%  ... \times p\left( \frac{x_m}{x_{m-1}},...,x_1\right)
-% \end{equation}
-%
-% IPF can be used to model the joint probability distribution
-% $p(x_1, x_2, x_3)$ subject to known probabilities
-% $p(x_1, x_2)$ and $p(x_1, x_3)$. Following \citet{Birkin1988} and \citet{Ballas2007simb},
-% if $p(x_1, x_2, x_3)$ is the $i^{th}$ approximation to the three-attribute joint probability
-% vector then:
-% \begin{equation}
-%  p^1(x_1, x_2, x_3) = \frac{1}{N_1 N_2 N_3}
-% \end{equation}
-% where $N_j$ is the number of possible states associated with the attribute vector $x$.
-% The vector can then be adjusted in \emph{proportion} to the following known constraints:
-% \begin{equation}
-% p^2(x_1, x_2, x_3) = p^1(x_1, x_2, x_3) \frac{p(x_1, x_2)}
-% {{\displaystyle \sum^{}_{x_3}{p^1(x_1, x_2, x_3)}}}
-% \label{eq:p2}
-% \end{equation}
-% \begin{equation}
-% p^3(x_1, x_2, x_3) = p^2(x_1, x_2, x_3) \frac{p(x_1, x_3)}
-% {{\displaystyle \sum^{}_{x_2}{p^1(x_1, x_2, x_3)}}}
-% \label{eq:p3}
-% \end{equation}
-% IPF involves iterating through equations \ref{eq:p2} and \ref{eq:p3}
-% until a \emph{fitted} distribution is obtained, when the probabilities
-% are convergent within some acceptable limit \citep{Birkin1988, Fienberg1970, Ballas2007simb}.
-% This procedure can be generalised to a larger number of attributes \citep{Birkin1988}:
-% if we let $Z_k(x)$ be a subset of the set of attribute vectors
-% $E(x)$ for which marginal joint probabilities are known and let $W_k(x)$ be
-% the complement of $Z_k(x)$, that is $W_k(x)= E(x) - Z_k(x)$, then:
-%
-% \begin{equation}
-%  p^1(x) = \frac{1}{\displaystyle{\prod^{m}_{i=1}{Ni}}}
-% \end{equation}
-% \begin{equation}
-%  p^2(x) =  p^1(x) \frac{p[Z_1(x)]}{\displaystyle{\sum^{}_{W_1(x)}{p^1(x)}}}
-% \label{eq:six}
-% \end{equation}
-%
-% {\centering
-% .
-%
-% .
-%
-% .
-%
-% }
-%
-% \begin{equation}
-%  p^{k+1}(x) =  p^k(x) \frac{p[Z_k(x)]}{\displaystyle{\sum^{}_{W_k(x)}{p^k(x)}}}
-% \label{eq:seven}
-% \end{equation}
-%
-% IPF iterates through equations \ref{eq:six} and \ref{eq:seven} until convergence
-% \citep{Birkin1988}. An extensive discussion of the mathematical properties of
-% IPF can be found in \citet{Fienberg1970}.
-
-The simple example below demonstrates how IPF works.
-Table \ref{t:w}  describes a
-hypothetical microdataset comprising 5 individuals, who are defined by two
+Let's start with a very basic dataset with a handful of individuals
+who will be assigned to zones via IPF. To aid understanding, we will do this
+first by hand
+to understand the process before automating it on the computer.
+Table \ref{t:w} shows 5 individuals, who are defined by two
 constraint variables: age and sex. Each has two categories.
-Table \ref{t:s} contains aggregated data
+Table \ref{t:s} contains data for zones
 for a hypothetical area. \Cref{t:s2} illustrates this table in a different form,
 which shows our ignorance of interaction between age and sex.
-
 
 \begin{table}[h]
 \centering
@@ -179,23 +115,26 @@ weights set to one). The bold value is used subsequently for
 illustrative purposes.}
 \begin{tabular}{llll}
 \toprule
-{Individual } & {Sex} & {Age-group} & {Weight} \\
+{Individual } & {Sex} & {Age} & {Weight} \\
 \midrule
-1 & Male & Over-50 & 1 \\
-2 & Male & Over-50 & 1 \\
-3 & {Male} & {Under-50} & \textbf{1} \\
-4 & Female & Over-50 & 1 \\
-5 & Female & Under-50 & 1 \\
+1 & Male & 59 & 1 \\
+2 & Male & 54 & 1 \\
+3 & {Male} & {35} & \textbf{1} \\
+4 & Female & 73 & 1 \\
+5 & Female & 49 & 1 \\
+% 1 & 59 & m \\
+% 2 & 54 & m \\
+% 3 & 35 & m \\
+% 4 & 73 & f \\
+% 5 & 49 & f \\
 \bottomrule
 \end{tabular}
 \label{t:w}
 \end{table}
-\vspace{1cm}
-
 
 \begin{table}[htbp]
 \centering
-\caption{Hypothetical small area constraints data ($s$).}
+\caption{Small area constraints ($s$).}
 \begin{tabular}{cllll}
 \toprule
 Constraint $\Rightarrow$ & \multicolumn{2}{c}{$i$}& \multicolumn{2}{c}{$j$}\\
@@ -226,7 +165,8 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 
 Table \ref{t:m} presents the
 hypothetical microdata in aggregated form,
-that can be compared directly to Table \ref{t:s2}.
+that can be compared directly to the aggregate data presented in
+Table \ref{t:s2}.
 
 \begin{table}[htbp]
 \centering
@@ -248,15 +188,14 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 \label{t:m}
 \end{table}
 
-Using these data it is possible to readjust the weights of the hypothetical
-individuals, so that their sum would add up to the totals given in Table
-\ref{t:s2} (12). In particular, the weights can be readjusted by multiplying them by
-the marginal totals, originally taken from
-Table \ref{t:s} and then divided by the respective marginal total in \ref{t:m}.
-Because the total for each small-area constraint is 12, this must be
-done one constraint at a time. This
-can be expressed, for a given area and a given constraint ($i$
-or age in this case), as follows:
+Using these tables we readjust the weights of the
+individuals so that their sum equals the total population of the area presented
+in Table \ref{t:s2}.
+The weights are multiplied
+by the aggregate level values from Table \ref{t:s} and divided by the
+respective marginal total of the microdata (see \ref{t:m}).
+This is done one constraint at a time, as described by
+\cref{eq:ipf} for constraint $i$ (age in this case):
 
 \begin{equation}
 w(n+1)_{ij} = \frac{w(n)_{ij} \times sT_{i}}{mT(n)_{i}}
@@ -268,12 +207,14 @@ weight for individuals with these characteristics, $sT_{i}$ is element
 marginal total of the small area constraint, $s$
 (Table \ref{t:s}) and $mT(n)_{i}$ is the marginal total of category
 $j$ of the aggregated results of the weighted
-microdata, $m$ (Table \ref{t:m}). $n$ represents the iteration number.
+microdata, $m$ (Table \ref{t:m}).
+$n$ represents the iteration number.
+
 Although the marginal totals of $s$ are known, its cell values
 are unknown. Thus, IPF estimates the interaction (or cross-tabulation)
 between constraint variables.
-(Follow the emboldened values in the tables
-to see how the new weight of individual 3 is calculated for the sex constraint.)
+Follow the emboldened values in the tables
+to see how the new weight of individual 3 is calculated for the sex constraint.
 Table \ref{t:new-weights} illustrates the weights that result. Notice that the
 sum of the weights is equal to the total population, from the constraint variables.
 
@@ -1064,11 +1005,6 @@ whole individuals. Integerisation of the weight matrices is needed.
 
 
 \section{Integerisation} \index{integerisation}
-A question raised by this research is this: How do integerised IPF results
-compare with other (e.g. combinatorial optimisation) approaches to spatial
-microsimulation?
-Studies have compared non-integer results of IPF with
-alternative approaches \citep{harland2012}, but not like-with-like.
 
 \section{Extensions to the basic model}
 \label{discuss}
