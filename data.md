@@ -1,7 +1,9 @@
 ---
-title: Input data
-layout: courseAbout
+layout: base
+title: Input data for the course
 ---
+
+
 
 All of the input data used in this course is publicly available,
 helping to ensure that the results are reproducible and accessible to
