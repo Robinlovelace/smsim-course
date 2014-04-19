@@ -238,7 +238,7 @@ hypothetical microdataset comprising 5 individuals, who are defined by two
 constraint variables: age and sex. Each has two categories.
 Table \ref{t:s} contains aggregated data
 for a hypothetical area. \Cref{t:s2} illustrates this table in a different form,
-which shows our ignorance of interaction between age and sex.
+which shows the unknown links between age and sex in the aggregate data.
 
 
 \begin{table}[h]
@@ -318,15 +318,13 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 \label{t:m}
 \end{table}
 
-Using these data it is possible to readjust the weights of the hypothetical
-individuals, so that their sum would add up to the totals given in Table
-\ref{t:s2} (12). In particular, the weights can be readjusted by multiplying them by
-the marginal totals, originally taken from
-Table \ref{t:s} and then divided by the respective marginal total in \ref{t:m}.
-Because the total for each small-area constraint is 12, this must be
-done one constraint at a time. This
-can be expressed, for a given area and a given constraint ($i$
-or age in this case), as follows:
+IPF readjusts the weights of the hypothetical
+individuals so that their add up to the totals given in Table
+\ref{t:s2}. The weights are multiplying
+by the marginal totals taken from Table \ref{t:s} and then divided by the
+respective marginal total in \ref{t:m}.
+This is done one constraint at a time. This is described in
+\cref{eq:ipf} for constraint $i$ (age in this case):
 
 \begin{equation}
 w(n+1)_{ij} = \frac{w(n)_{ij} \times sT_{i}}{mT(n)_{i}}
