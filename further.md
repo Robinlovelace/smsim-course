@@ -1,6 +1,6 @@
 ---
 title: Further study
-layout: courseAbout
+layout: base
 ---
 
 Spatial microsimulation is a large and complex topic, with over 30 years of
