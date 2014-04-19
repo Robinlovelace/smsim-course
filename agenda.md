@@ -51,8 +51,8 @@ To reiterate and expand on this information, the agenda is as follows.
 
 - 11:15 - 12:30 Extensions to the basic model
  - As an input into agent based models
- <!--- Adding estimated home (and work) locations-->
- <!--- Grouping individuals into household units-->
+<!--- Adding estimated home (and work) locations-->
+<!--- Grouping individuals into household units-->
 - 12:30 - 1:30 Tailoring the code for your needs
 
 
