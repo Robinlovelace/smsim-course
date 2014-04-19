@@ -1,0 +1,20 @@
+\contentsline {section}{\numberline {1}Foundations}{1}{section.1}
+\contentsline {subsection}{\numberline {1.1}Prerequisites for this practical}{1}{subsection.1.1}
+\contentsline {subsection}{\numberline {1.2}Learning spatial microsimulation by doing it}{2}{subsection.1.2}
+\contentsline {subsection}{\numberline {1.3}Some input data}{3}{subsection.1.3}
+\contentsline {subsection}{\numberline {1.4}The IPF equation}{3}{subsection.1.4}
+\contentsline {subsection}{\numberline {1.5}Test your understanding}{4}{subsection.1.5}
+\contentsline {subsection}{\numberline {1.6}IPF in a spreadsheet}{4}{subsection.1.6}
+\contentsline {subsection}{\numberline {1.7}Implementing IPF in R}{5}{subsection.1.7}
+\contentsline {section}{\numberline {2}CakeMap: A worked example}{7}{section.2}
+\contentsline {subsection}{\numberline {2.1}Loading the input data}{7}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Preparing the input data for IPF}{7}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Performing IPF on the CakeMap data}{7}{subsection.2.3}
+\contentsline {section}{\numberline {3}Applying the technique in the real world}{7}{section.3}
+\contentsline {subsection}{\numberline {3.1}Model checking}{7}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Model validation}{7}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Integerisation}{7}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Estimating home locations}{7}{subsection.3.4}
+\contentsline {section}{\numberline {4}Glossary}{7}{section.4}
+\contentsline {section}{\numberline {5}References}{7}{section.5}
+\vspace {2em}
