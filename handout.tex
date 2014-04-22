@@ -10,6 +10,9 @@
 \usepackage{color}
 \usepackage{hyperref}
 \usepackage{booktabs}
+\usepackage{float} % allows forcing of float position
+% \restylefloat{table}
+\usepackage{bm}
 
 % Add toc to contents
 \usepackage[nottoc,numbib]{tocbibind}
@@ -52,6 +55,7 @@
 \usepackage{verbatim}  % Needed for the "comment" environment to make LaTeX comments
 \usepackage{wallpaper}
 \usepackage{cases}
+\usepackage{wrapfig}
 \makeindex
 % \renewcommand{\includegraphics}[2][]{\fbox{#2}} %omits images
 \begin{document}
@@ -65,6 +69,7 @@
 
 \tableofcontents
 
+\newpage
 \section{Foundations}
 
 \subsection{Prerequisites for this practical}
@@ -83,21 +88,29 @@ Click on the ``Download ZIP'' button to the right of this page and extract
 the folder into your desktop or other suitable place on your computer.
 % Could add screenshot of Dl ZIP here!!!
 
+\begin{wrapfigure}{2}{9cm}
+\begin{center}
+   \includegraphics[width=9cm]{rstudio}
+\end{center}
+ \caption{The RStudio user interface. Note the project title `smsim-course' in
+the top right and the `Files' tab at the top of the left hand window.}
+\label{frstudio}
+\end{wrapfigure}
+
 Once the folder has been successfully extracted open it in
 your browser and take a look around. You will sub-folders
-entitled `cakeMap', `data', `figures' and `rcode'. The contents of
-each can be guessed from their titles and will become clearer
-throughout the course of this tutorial. When you get to the
+entitled `cakeMap', `data', `figures' and `rcode'. When you get to the
 sections that use R code, it is useful for R to operate from
 within the smsim-course-master folder. Probably the best way
 to set this up is to open the file `smsim-course.Rproj' from
-within RStudio. Try this now and click on the `Files' tab in the
-bottom right hand window of RStudio (add screenshot here!!!).
+within RStudio (\cref{frstudio}).
+Try this now and click on the `Files' tab in
+the bottom right hand window of RStudio.
 Before using the power of R in RStudio it's worth
 understanding a bit about `IPF', the algorithm we will use to generate
 the synthetic population or `spatial microdata' (\cref{fmsim-schema}).
 
-\subsection{Learning spatial microsimulation by doing it}
+\subsection{Learning by doing}
 
 As \citet[xxii]{kabacoff2011r} put it regarding R, ``the best
 way to learn is to experiment'' and the same applies to spatial microsimulation.
@@ -107,7 +120,13 @@ be discouraged. In fact it is by making blunders, identifying and then correctin
 that many people learn best. Think of someone learning to skate: no one ever
 picks up a skateboard for the first time being able to `surf the sidewalks'. It
 takes time, patience and plenty of falls before you master the art.
-The same applies to spatial microsimulation. 
+The same applies to spatial microsimulation.
+
+One of the tricky things about spatial microsimulation for newcomers is its use
+of specialist language. It is important to know exactly what is meant by
+`special microdata' and other technical terms. To this end we have created a
+glossary that provide succinct definitions (see \cref{gloss}). Any term that is
+\emph{italicised} in the text has a glossary entry.
 
 Spatial microsimulation works by taking \emph{microdata} at the individual level
 and using aggregate-level constraints to allocate these individuals to zones.
@@ -124,41 +143,49 @@ bogged down in theory or applications in this course: we want to `get our
 hands dirty'. Next we will do just that, by applying the process to some
 example data.
 
-\begin{figure}
+\begin{figure}[H]
 \begin{center}
-  \includegraphics[width=7cm]{msim-schema}
+  \includegraphics[width=9cm]{msim-schema}
 \end{center}
-\caption{Schema of iterative proportional fitting (IPF) and combinatorial optimisation
-in the wider context of the availability of different data formats and spatial microsimulation. \label{fmsim-schema}}
+\caption{Schema of iterative proportional fitting (IPF) and combinatorial
+optimisation
+in the wider context of the availability of different data formats and spatial
+microsimulation. \label{fmsim-schema}}
 \end{figure}
+
 
 \subsection{Some input data} \label{s:theory}
 
-Let's start with a very basic dataset with a handful of individuals
-who will be assigned to zones via IPF. To aid understanding, we will do this
-first by hand
+Let's start with a very basic dataset. To aid understanding, we will first do
+the reweighting by hand
 to understand the process before automating it on the computer.
 Table \ref{t:w} shows 5 individuals, who are defined by two
-constraint variables: age and sex. Each has two categories.
-Table \ref{t:s} contains data for zones
-for a hypothetical area. \Cref{t:s2} illustrates this table in a different form,
-which shows our ignorance of interaction between age and sex.
+constraint variables: age and sex.
+Table \ref{t:s} contains data for a hypothetical area. \Cref{t:s2} illustrates
+this aggregate level table in a different form,
+to show our ignorance of interaction between age and sex. Finally, table
+\ref{t:m} presents the hypothetical microdata in aggregated form,
+that can be compared directly to the aggregate data presented in
+Table \ref{t:s2}.
 
 \begin{table}[h]
-\centering
-\caption[A hypothetical input microdata set]{A
-hypothetical input microdata set (the original
-weights set to one). The bold value is used subsequently for
-illustrative purposes.}
-\begin{tabular}{llll}
+% {r}{10cm}
+\caption{A hypothetical input microdata set
+% (the original
+% weights set to one). The bold value is used subsequently for
+% illustrative purposes.
+}
+\label{t:w}
+\begin{center}
+ \begin{tabular}{llll}
 \toprule
-{Individual } & {Sex} & {Age} & {Weight} \\
+{Individual } & {Age} & {Sex}  & {Weight} \\
 \midrule
-1 & Male & 59 & 1 \\
-2 & Male & 54 & 1 \\
-3 & {Male} & {35} & \textbf{1} \\
-4 & Female & 73 & 1 \\
-5 & Female & 49 & 1 \\
+1 & 59 & Male  & 1 \\
+2 & 54 & Male & 1 \\
+3 & {35} & {Male} & \textbf{1} \\
+4 & 73 & Female & 1 \\
+5 & 49 & Female & 1 \\
 % 1 & 59 & m \\
 % 2 & 54 & m \\
 % 3 & 35 & m \\
@@ -166,25 +193,24 @@ illustrative purposes.}
 % 5 & 49 & f \\
 \bottomrule
 \end{tabular}
-\label{t:w}
+\end{center}
 \end{table}
 
-\begin{table}[htbp]
-\centering
-\caption{Small area constraints ($s$).}
+\begin{table}[H]
+\centering{
+\caption{Small area constraints ($s$). \label{t:s}}
 \begin{tabular}{cllll}
 \toprule
 Constraint $\Rightarrow$ & \multicolumn{2}{c}{$i$}& \multicolumn{2}{c}{$j$}\\
 Category $\Rightarrow$ & $i_1$ & $i_2$ & $j_1$ & $j_2$ \\
 Area $\Downarrow$  & Under-50 & Over-50 &  Male & Female\\
-1  & 8 & 4 & 6 & 6\\
+1  & \textbf{8} & 4 & 6 & 6\\
 \bottomrule
-\end{tabular}
-\label{t:s}
+\end{tabular}}
 \end{table}
 \vspace{1cm}
 
-\begin{table}[htbp]
+\begin{table}[h]
 \centering
 \caption[Small area constraints expressed as marginal totals]{Small
 area constraints expressed as marginal totals, and the cell
@@ -192,18 +218,13 @@ values to be estimated.}
 \begin{tabular}{cllll}\toprule
 Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 & Age/sex & Male & Female & T\\ \midrule
-\multirow{2}{*}{$i$} & Under-50 & \textbf{?} & ? & 8\\
+\multirow{2}{*}{$i$} & Under-50 & \textbf{?} & ? & \textbf{8}\\
 & Over-50 & ? & ? &4 \\
 & T & 6 & 6 &12\\
 \bottomrule
 \end{tabular}
 \label{t:s2}
 \end{table}
-
-Table \ref{t:m} presents the
-hypothetical microdata in aggregated form,
-that can be compared directly to the aggregate data presented in
-Table \ref{t:s2}.
 
 \begin{table}[htbp]
 \centering
@@ -217,7 +238,7 @@ weights allocated in Table \ref{t:w} and therefore
 \begin{tabular}{cllll}\toprule
 Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 & Age/sex & Male & Female & T\\ \midrule
-\multirow{2}{*}{$i$} & Under-50 & \textbf{1} & 1 & 2\\
+\multirow{2}{*}{$i$} & Under-50 & \textbf{1} & 1 & \textbf{2}\\
 & Over-50 & 2 & 1 &3 \\
 & T & 3 & 2 &5\\
 \bottomrule
@@ -225,13 +246,13 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 \label{t:m}
 \end{table}
 
-\subsection{The IPF equation}
+\subsection{The IPF equation} \label{ipfeq}
 Using these tables we readjust the weights of the
 individuals so that their sum equals the total population of the area presented
 in Table \ref{t:s2}.
-The weights are multiplied
+For each constraint, the weights are multiplied
 by the aggregate level values from Table \ref{t:s} and divided by the
-respective marginal total of the microdata (see \ref{t:m}).
+respective marginal total of the microdata (see \cref{t:m}).
 This is done one constraint at a time, as described by
 \cref{eq:ipf} for constraint $i$ (age in this case):
 
@@ -248,10 +269,10 @@ $j$ of the aggregated results of the weighted
 microdata, $m$ (Table \ref{t:m}).
 $n$ represents the iteration number.
 
-Do not worry too much about understanding the above equation for now.
-More important is implementing it. Follow the emboldened values in the tables
-to see how the new weight of individual 3 is calculated for the sex constraint.
-Table \ref{t:new-weights} illustrates the weights that result. Notice that the
+Do not worry about understanding the above equation for now.
+More important is implementing it. Follow the emboldened values in tables 1 to 4
+to see how the new weight of individual 3 is calculated for the age constraint.
+Table \ref{t:new-weights} illustrates the outcome. Notice that the
 sum of the weights is equal to the total population, from the constraint variables.
 
 \begin{table}[htbp]
@@ -268,6 +289,8 @@ Table \ref{t:s}.}
 \textbf{8}/\textbf{2} = 4$ \\
 4 & Female & Over-50 & 1 & $1 \times 4/3 = \frac{4}{3}$ \\
 5 & Female & Under-50 & 1 & $1 \times 8/2 = 4$ \\
+\midrule
+Total & & & 5 & 12 \\
 \bottomrule
 \end{tabular}
 \label{t:new-weights}
@@ -284,26 +307,49 @@ w(3)_{ij} = \frac{w(2)_{ij} \times sT_{j}}{mT(2)_{j}}
 \end{equation}
 
 \subsection{Test your understanding}
-To test your understanding of IPF, apply \cref{eq:ipf2} to the information above
+To test your understanding of IPF, try to apply \cref{eq:ipf2} to the
+information above
 and that presented in \cref{t:m2}.
 This should result in the following vector of new weights, for individuals 1 to
 5. Calculate the correct values and pencil them in in place of the question
-marks. One `sanity' check of your method here is whether the sum of these
-weights is still equal to twelve. % Add online link to answers - tinyurl
+marks.  % Add online link to answers - tinyurl
+
 
 \begin{equation}
-w(3) = (\frac{6}{5}, \frac{?}{?}, \frac{18}{5}, \frac{?}{?}, \frac{9}{2})
+w(3) = (\frac{6 \times \frac{4}{3}}{6 \frac{2}{3}}, \frac{6 \times
+\frac{4}{3}}{?}, \boldsymbol{ \frac{4 \times 6}{ 6\frac{2}{3}
+}}, \frac{?}{?}, \frac{4 \times 6}{5 \frac{1}{3}})
 % w(3) = (\frac{6}{5}, \frac{6}{5}, \frac{18}{5}, \frac{3}{2}, \frac{9}{2})
 \end{equation}
 
+After simplifying these fractions, the results are as follows.
+One `sanity' check of your method here is whether the sum of these
+weights is still equal to the area's total population of twelve. Test this is
+true:
+
+\begin{equation}
+% w(3) = (\frac{6}{5}, \frac{6}{?}, \boldsymbol{ \frac{4 \times 6}{ 6\frac{2}{3}
+% }}, \frac{?}{?}, \frac{9}{2})
+w(3) = (\frac{6}{5}, \frac{6}{5}, \boldsymbol{\frac{18}{5}}, \frac{3}{2},
+\frac{9}{2})
+\end{equation}
+
+What do the weights in w(3) actually mean? They indicate how representative
+each individual is of the target zone after one iteration of IPF, constraining
+by age and sex. Individual number 5 has the highest weight because there is
+only one young female in the survey dataset yet seemingly many in the area in
+question.
+
 Notice also that after each iteration the fit between the marginal
 totals of $m$ and $s$
-improves. The total absolute error (TAE) improves
-between $m(1)$ to $m(2)$, falling from
+improves.\footnote{This can be checked by comparing the aggregated weighted
+individuals with the small area constraints. Total absolute error (TAE),
+defined as the sum of all differences between simulated and observed marginal
+totals, improves between $m(1)$ to $m(2)$, falling from
 14 to 6 in \cref{t:m} and \cref{t:m2} above. TAE for $m(3)$ (not shown,
 but calculated by aggregating $w(3)$) improves even more, to 1.3.
 This number would eventually converge to 0 through subsequent
-iterations, a defining feature of IPF.
+iterations, a defining feature of IPF.}
 
 
 \begin{table}[htbp]
@@ -316,9 +362,9 @@ microdata set after constraining for age ($m(2)$).
 \begin{tabular}{cllll}\toprule
 Marginal totals&  & \multicolumn{2}{c}{$i$} & \\
 & Age/sex & Male & Female & T\\ \midrule
-\multirow{2}{*}{$j$} & Under-50 & 4 & 4 & 8\\
+\multirow{2}{*}{$j$} & Under-50 & \textbf{4} & 4 & 8\\
 & Over-50 & $\frac{8}{3}$ & $\frac{4}{3}$ & 4 \\
-& T & $6\frac{2}{3}$ & 5$\frac{1}{3}$ & 12\\
+& T & $\boldsymbol{6\frac{2}{3}}$ & 5$\frac{1}{3}$ & 12\\
 \bottomrule
 \end{tabular}
 \label{t:m2}
@@ -330,21 +376,23 @@ Marginal totals&  & \multicolumn{2}{c}{$i$} & \\
 % known at the local level (e.g. income).
 
 \subsection{IPF in a spreadsheet}
-Computer code is absent from most people's daily lives so the
-R code we use to automate IPF will likely seem like a foreign language
-to many. Spreadsheet programs like Microsoft Excel and LibrOffice Calc are
-comparatively well known, though. To ensure smooth transition between the IPF process
+% Computer code is absent from most people's daily lives so the
+% R code we use to automate IPF will likely seem like a foreign language
+% to many. Spreadsheet programs like Microsoft Excel and LibrOffice Calc are
+% comparatively well known, though.
+To ensure smooth transition between the IPF process
 described in mathematics above and its implementation in R this section
 provides an intermediary stage: the speed of computation and the visual support
 of a graphical user interface (GUI).
 
 
-\subsection{Implementing IPF in R} \label{simplementing} % priority: automate!!!
-So far we have implemented IPF by hand and in widely known spreadsheet programs.
+\subsection{IPF in R: a simple example} \label{simplementing}
+% priority: automate!!!
+So far we have implemented IPF by hand and in a spreadsheet.
 This section explains how the IPF
 \emph{algorithm} described above is implemented in R, using the
 same input data.\footnote{A fuller tutorial is available from Rpubs, a site dedicated
-to publishing R analyses that are reproducible. It uses the RMarkdown
+to publishing R analyses that are reproducible. This tutorial uses the RMarkdown
 mark-up language, which enables R code to be run and presented within
 documents. See http://rpubs.com/RobinLovelace/5089 \label{fnrpub} .}
 % This section is based on ``Spatial microsimulation in R: a
@@ -353,37 +401,25 @@ documents. See http://rpubs.com/RobinLovelace/5089 \label{fnrpub} .}
 
 \emph{Loading in the data}
 
-Usually the input data for spatial microsimulation are loaded from
- .csv files, one for each
-constraint and one for the input microdata. These are read-in with the command
-\verb read.csv . For the purposes of understanding how the model works,
-the dataset is read line by line, following the
-example above. The following code creates example datasets,
-based on the same hypothetical survey of 5 individuals described above,
-and 5 small areas. The spatial microsimulation model will select individuals
-based on age and sex and mode of transport (mode of transport
-is also used on the larger online example described in footnote \ref{fnrpub}).
-For consistency with the (larger) model used for the paper, 
-the individual level data will be referred to as USd (Understanding Society dataset)
-and the geographic data as all.msim (for all constraint variables).
-The code to read-in the individual level data are presented in code sample \ref{cusd}.
-When called, the data are then displayed as a table (see listing \ref{cout}).
-\begin{lstlisting}[float=h, caption={Manual input of individual level data
-in R}, label=cusd]
-# Read in the data in long form (normaly read.table() used)
-c.names <- c("id", "age", "sex")
-USd <- c(       1, 59, "m",
-                2, 54, "m",
-                3, 35, "m",
-                4, 73, "f",
-                5, 49, "f")
-USd <- matrix(USd, nrow = 5, byrow = T) # Long data into matrix
-USd <- data.frame(USd) # Convert this into a dataframe
-names(USd) <- c.names # Add correct column names
-USd$age <- as.numeric(levels(USd$age)[USd$age]) # Age is a numeric
+The data presented in the above worked example are saved in the
+`simple' sub-folder of `data' as .csv files. To load them in R,
+we use the following commands:
+
+\begin{lstlisting}[float=h, caption={Loading the input data in R}, label=cusd]
+ind <- read.csv("data/simple/ind.csv") # load the individual level data
+cons <- read.csv("data/simple/cons.csv") # load aggregate constraints
 \end{lstlisting}
-\begin{lstlisting}[float=h, caption={Output of the USd data frame}, label=cout]
-USd # Show the data frame in R
+
+To check that the \emph{data frames} have loaded correctly, simply
+ask R to print their contents by entering the object's name. To display the
+individual level data, for example simply type the
+following:\footnote{An alternative
+way to do this is to click on the object's name in the `Environment' tab in
+RStudio's top right window.}
+
+\begin{lstlisting}[float=h, caption={Checking the contents of the individual
+level data frame}, label=cout]
+ind # Show the data frame in R
 ##   id age sex
 ## 1  1  59   m
 ## 2  2  54   m
@@ -391,50 +427,166 @@ USd # Show the data frame in R
 ## 4  4  73   f
 ## 5  5  49   f
 \end{lstlisting}
-The same procedure applies to the geographical data (listing \ref{cgeo}).
-\begin{lstlisting}[float=h*, caption={Geographic data input}, label=cgeo]
- category.labels <- c("16-49", "50+" # Age constraint
-             ,"m", "f" # Sex constraint
-             # more constraints could go here
-             )
-all.msim <- c(  8, 4,    6, 6,   # Original aggregate data
-                2, 8,    4, 6,   # Elderly
-                7, 4,    3, 8,   # Female dominated
-                5, 4,    7, 2,   # Male dominated
-                7, 3,    6, 4    # Young
-                )
-all.msim <- matrix(all.msim, nrow = 5, byrow = T) 
-all.msim <- data.frame(all.msim) # Convert to dataframe
-names(all.msim) <- category.labels # Add correct column names
+
+Note that the input data is identical to the tables illustrated above for
+consistency. Instead of constraining for just one zone as we did in the example
+above, we will fit the data to six zones here. To subset a dataset, add square
+brackets to the end of the object's name in R. Entering \verb cons[1:2,] ,
+for example should output the first two rows of the constraint variable:
+within the square brackets the number before the comma refers to columns (blank
+means all columns) and the numbers after the comma refer to rows. If the output
+of this command looks like the text below, congratulations are in order:
+you have successfully loaded the constraint dataset.
+
+\begin{lstlisting}[float=h, caption={Printing a subset of the constraint data
+in R},
+label=cout]
+cons[1:2,]
+##    X16.49 X50. m f
+##  1      8    4 6 6
+##  2      2    8 4 6
 \end{lstlisting}
 
-IPF relies on the assumption that all constraint variables will contain the
-same number of people. This is logical (how can there be more people classified
-by age than by sex?) but can cause problems for constraint variables that use
-only a subset of the total population, such as those who responded to questions on
-travel to work. To overcome this problem, it is possible to normalise the
-constraint variables, setting the total for each to the one that has the most
-reliable total population. This worked example simply checks whether
-or not they are (listing \ref{ccheck}).
+Note that the top row is identical to \cref{t:s} --- we can therefore compare
+the results of doing IPF on the computer with the results obtained by hand.
 
-\begin{lstlisting}[float=h, caption={R code to check the constrain populations
-match}, label=ccheck]
- # Check totals for each constraint match
-rowSums(all.msim[,1:2]) # Age constraint
-## [1] 12 10 11  9 10
-rowSums(all.msim[,3:4]) # Sex constraint
-## [1] 12 10 11  9 10
+% !!! Manual input of data for book!!!
+% Usually the input data for spatial microsimulation are loaded from
+%  .csv files, one for each
+% constraint and one for the input microdata. These are read-in with the command
+% \verb read.csv . For the purposes of understanding how the model works,
+% the dataset is read line by line, following the
+% example above. The following code creates example datasets,
+% based on the same hypothetical survey of 5 individuals described above,
+% and 5 small areas. The spatial microsimulation model will select individuals
+% based on age and sex and mode of transport (mode of transport
+% is also used on the larger online example described in footnote \ref{fnrpub}).
+% For consistency with the (larger) model used for the paper, 
+% the individual level data will be referred to as USd (Understanding Society dataset)
+% and the geographic data as all.msim (for all constraint variables).
+% The code to read-in the individual level data are presented in code sample \ref{cusd}.
+% When called, the data are then displayed as a table (see listing \ref{cout}).
+% \begin{lstlisting}[float=h, caption={Manual input of individual level data
+% in R}, label=cusd]
+% # Read in the data in long form (normaly read.table() used)
+% c.names <- c("id", "age", "sex")
+% USd <- c(       1, 59, "m",
+%                 2, 54, "m",
+%                 3, 35, "m",
+%                 4, 73, "f",
+%                 5, 49, "f")
+% USd <- matrix(USd, nrow = 5, byrow = T) # Long data into matrix
+% USd <- data.frame(USd) # Convert this into a dataframe
+% names(USd) <- c.names # Add correct column names
+% USd$age <- as.numeric(levels(USd$age)[USd$age]) # Age is a numeric
+% \end{lstlisting}
+% \begin{lstlisting}[float=h, caption={Output of the USd data frame}, label=cout]
+% USd # Show the data frame in R
+% ##   id age sex
+% ## 1  1  59   m
+% ## 2  2  54   m
+% ## 3  3  35   m
+% ## 4  4  73   f
+% ## 5  5  49   f
+% \end{lstlisting}
+% The same procedure applies to the geographical data (listing \ref{cgeo}).
+% \begin{lstlisting}[float=h*, caption={Geographic data input}, label=cgeo]
+%  category.labels <- c("16-49", "50+" # Age constraint
+%              ,"m", "f" # Sex constraint
+%              # more constraints could go here
+%              )
+% all.msim <- c(  8, 4,    6, 6,   # Original aggregate data
+%                 2, 8,    4, 6,   # Elderly
+%                 7, 4,    3, 8,   # Female dominated
+%                 5, 4,    7, 2,   # Male dominated
+%                 7, 3,    6, 4    # Young
+%                 )
+% all.msim <- matrix(all.msim, nrow = 5, byrow = T) 
+% all.msim <- data.frame(all.msim) # Convert to dataframe
+% names(all.msim) <- category.labels # Add correct column names
+% \end{lstlisting}
 
-rowSums(all.msim[,1:2]) == rowSums(all.msim[,3:4])
-## [1] TRUE TRUE TRUE TRUE TRUE
+% IPF relies on the assumption that all constraint variables will contain the
+% same number of people. This is logical (how can there be more people classified
+% by age than by sex?) but can cause problems for constraint variables that use
+% only a subset of the total population, such as those who responded to questions on
+% travel to work. To overcome this problem, it is possible to normalise the
+% constraint variables, setting the total for each to the one that has the most
+% reliable total population. This worked example simply checks whether
+% or not they are (listing \ref{ccheck}).
+
+% \begin{lstlisting}[float=h, caption={R code to check the constrain populations
+% match}, label=ccheck]
+%  # Check totals for each constraint match
+% rowSums(all.msim[,1:2]) # Age constraint
+% ## [1] 12 10 11  9 10
+% rowSums(all.msim[,3:4]) # Sex constraint
+% ## [1] 12 10 11  9 10
+% 
+% rowSums(all.msim[,1:2]) == rowSums(all.msim[,3:4])
+% ## [1] TRUE TRUE TRUE TRUE TRUE
+% \end{lstlisting}
+
+To make the individual level data comparable to the aggregate level we must
+first categorise it and count the number in each category. This job is
+performed by the R \emph{script} categorise.R, contained in the `simple' data
+folder. Run it by entering
+\verb source("data/simple/categorise.R")) . This results in the creation of a
+new object called ind.cat, which converts the variables into a matrix of 0s and
+1s with same number of columns as the constraint data. Note that the
+`categories.R' script must be modified each time it is used with a different
+dataset. To check that the script has worked
+properly, lets count the number of individuals it contains:
+
+\begin{lstlisting}[float=h, caption={Output from ind.cat}, label=ccheck]
+colSums(ind.cat)
+##    a16.49   a50.      m      f
+##         2      3      3      2 
 \end{lstlisting}
 
-\emph{Reweighting the survey dataset}
+The sum of both age and sex variables is 5 (the total number of individuals): it
+worked! Now the data is in the same form as the constraint variables and we
+have checked the data makes sense, we can create the `weight' matrix and begin
+reweighting the individuals to
+zones:\footnote{The
+above code will probably seem
+daunting and not make sense unless
+you are an experienced R user. Do not worry about this for now, you can always
+check what is going on later by checking R's documentation (e.g. try entering
+`?rep') or
+by pressing the tab key when entering arguments for R commands. For the time
+being, it is best to press-on with the example and understand the concepts ---
+the details can be looked at later.}
 
-Iterative proportional fitting determines the weight allocated to each
-individual for each zone to best match the geographically aggregated data.
-A weight matrix is therefore created, with rows corresponding to individuals
-and columns to zones, as described in \cref{s:theory}.
+\begin{lstlisting}[float=h, caption={Creating the weight and aggregated
+individual level matrices}, label=ccheck]
+weights <- array(1, dim=c(nrow(ind),nrow(cons)))
+ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons))
+\end{lstlisting}
+
+With all of these objects in place, we are ready to begin allocating new weights
+to the individuals via IPF. Below is written in code the IPF formula presented
+in \cref{ipfeq}.
+
+\begin{lstlisting}[float=h, caption={Creating new weights for the individuals
+based on constraint 1 (sex) via IPF}, label=ccheck]
+for (j in 1:nrow(cons)){
+  for(i in 1:ncol(con1)){
+ weights[which(ind.cat[,i] == 1),j] <- con1[j,i] / ind.agg[j,i]}}
+\end{lstlisting}
+
+The above code created the weight matrix that allocates individuals to zones.
+Aggregating this data to zones allows us to update `ind.agg' with new values
+that will be closer to the constraint variables.
+
+\subsection{Iterations}
+
+In the above example, we have seen the `bare bones' of spatial microsimulation
+using IPF to generate weights from which sample populations can be created.
+To perform multiple iterations of the same model, we have prepared a slightly
+more complex script than `simple.R' called `etsim.R' that can be found in the
+simple folder. This generates weights for as many iterations as you please (by
+setting the value of \verb num.its ).
 
 There
 is great scope for taking the analysis further:
@@ -480,10 +632,22 @@ in the results are important.
 \subsection{Estimating home locations}
 % Apply for one zone only - just iterate after
 
-\section{Glossary}
+\section{Glossary} \label{gloss}
 \begin{itemize}
 \item \textbf{Algorithm}: a series of computer commands which are executed in a well
-defined order. Algorithms process input data and produce an output.  
+defined order. Algorithms process input data and produce an output.
+\item \textbf{Data frame}: a type of object (formally referred to as a class)
+in R, data frames are square tables composed of rows and columns of
+information. As with many things in R, the best way to understand dataframes is
+to create them and experiment. The following creates a dataframe with two
+variables: name and height:
+\begin{verbatim}
+ data.frame(name = c("Robin", "Phil"), height.cm = c(172, 174))
+\end{verbatim}
+Note that each new variable is entered using the command \verb c() . This is
+how R creates objects with the \emph{vector} data class --- a one dimensional
+matrix --- and that text data must be entered in quote marks.
+
 \item \textbf{Iteration}: one instance of a process that is repeated many times until
 a predefined end point, often within an \emph{algorithm}.
  \item \textbf{Iterative proportional fitting} (IPF): an iterative process implemented in

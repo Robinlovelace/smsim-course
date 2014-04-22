@@ -1,6 +1,6 @@
 ############################################
-#### From the IPF-performance-testing github repo  
-#### https://github.com/Robinlovelace/IPF-performance-testing
+#### IPFinR a script for IPF in R 
+#### Robin Lovelace (2013)
 ############################################
 
 num.its <- 3 # how many iterations will we run?
@@ -13,25 +13,21 @@ num.its <- 3 # how many iterations will we run?
 # The R will be able to 'see' the files to be loaded 
 list.files() # you should see age.csv and other input data here
 
-ind <- read.csv("ind.csv")
-constraints <- read.csv("cakeMap/all.msim.csv")
-num.cons <- 3  # calculate n. constraints (can set manually)
+ind <- read.csv("data/simple/ind.csv")
+con1 <- read.csv("data/simple/age.csv") # add the age constraint data 
+con2 <- read.csv("data/simple/sex.csv") # add the sex constraint data
+num.cons <- length(grep(pattern="con[1-9]", x=ls()))  # calculate n. constraints (can set manually)
+
+# checking that totals add up, add more if need's be
+sum(con1)
+sum(con2) # check populations are equal
+all.msim <- cbind(con1, con2)
+
+# setting-up reweighting data
 category.labels <- names(all.msim) # should be correct from cons.R
 
 # set-up aggregate values - column for each category
-source("cakeMap/categorise.R") # this script must be customised to input data
-??? up to here!
-
-
-
-
-
-
-
-
-
-
-
+source("data/simple/categorise.R") # this script must be customised to input data
 ind.cat[1:3, 1:4] # take a look at the first 2 rows and 4 columns of ind.cat - as expected?
 # check constraint totals - should be true
 sum(ind.cat[,1:ncol(con1)]) == nrow(ind) # is the number in each category correct?
@@ -53,11 +49,11 @@ ind.agg # look at what we've created - n. individuals replicated throughout
 # Re-weighting for constraint 1 via IPF 
 for (j in 1:nrow(all.msim)){
   for(i in 1:ncol(con1)){
- weights[which(ind.cat[,i] == 1),j,1] <- con1[j,i] /ind.agg[j,i,1]}}
+ weights[which(ind.cat[,i] == 1),j,1] <- con1[j,i] / ind.agg[j,i,1]}}
 for (i in 1:nrow(all.msim)){ # convert con1 weights back into aggregates
   ind.agg[i,,2]   <- colSums(ind.cat * weights[,i,num.cons+1] * weights[,i,1])}
 # test results for first row (not necessary for model)
-ind.agg[1,1:2,2] - all.msim[1,1:2] # should be zero
+ind.agg[1,,2] - all.msim[1,] # should be zero
 
 # second constraint
 for (j in 1:nrow(all.msim)){
@@ -76,7 +72,7 @@ indf[,,,1,1] <- ind.agg
 
 # loop for multiple iterations (run e2.R repeatedly, saving each time)
 for(it in 2:num.its){
-source(file="e2.R")
+source(file="data/simple/e2.R")
 wf[,,,it,1] <- weights
 indf[,,,it,1] <- ind.agg
 }
