@@ -3,68 +3,66 @@
 #### https://github.com/Robinlovelace/IPF-performance-testing
 ############################################
 
-num.its <- 3 # how many iterations will we run?
+num.its <- 2 # how many iterations will we run?
 
 # Loading the data: Ensure R is in the right working directory 
-# (input-data/simple or models/simple). Check this by entering getwd()
-# new working directories can be set with setwd("directory") 
-# alternatively, RStudio can set the working directory.
-# E.g. Session > Set working directory > To Source file location
-# The R will be able to 'see' the files to be loaded 
-list.files() # you should see age.csv and other input data here
+ind <- read.csv("data/cakeMap/ind.csv")
+cons <- read.csv("data/cakeMap/cons.csv")
 
-ind <- read.csv("ind.csv")
-constraints <- read.csv("cakeMap/all.msim.csv")
+# load constraints separately - normally this would be first stage
+con1 <- cons[1:12]
+con2 <- cons[13:14]
+con3 <- cons[15:24]
+
 num.cons <- 3  # calculate n. constraints (can set manually)
-category.labels <- names(all.msim) # should be correct from cons.R
+category.labels <- names(cons) # should be correct from cons.R
 
 # set-up aggregate values - column for each category
-source("cakeMap/categorise.R") # this script must be customised to input data
-??? up to here!
+source("data/cakeMap/categorise.R") # this script must be customised to input data
 
-
-
-
-
-
-
-
-
-
-
-ind.cat[1:3, 1:4] # take a look at the first 2 rows and 4 columns of ind.cat - as expected?
 # check constraint totals - should be true
 sum(ind.cat[,1:ncol(con1)]) == nrow(ind) # is the number in each category correct?
 sum(ind.cat[,ncol(con1)+1:ncol(con2)]) == nrow(ind) 
 
 # create weights in 3D matrix (individuals, areas, iteration)
-weights <- array(dim=c(nrow(ind),nrow(all.msim),num.cons+1)) 
+weights <- array(dim=c(nrow(ind),nrow(cons),num.cons+1)) 
 weights[,,num.cons+1][] <- 1 # sets initial weights to 1
 ini.ws <- weights[,,num.cons+1]
 
 # convert survey data into aggregates to compare with census (3D matix)
-ind.agg <- array(dim=c(nrow(all.msim),ncol(all.msim),num.cons+1))
-for (i in 1:nrow(all.msim)){
+ind.agg <- array(dim=c(nrow(cons),ncol(cons),num.cons+1))
+for (i in 1:nrow(cons)){
   ind.agg[i,,1]   <- colSums(ind.cat) * weights[1,i,num.cons+1]}
-ind.agg # look at what we've created - n. individuals replicated throughout
+ind.agg[1:5,1:10,1] # look at what we've created - n. individuals replicated throughout
 
 ############## The IPF part #############
 
 # Re-weighting for constraint 1 via IPF 
-for (j in 1:nrow(all.msim)){
+for (j in 1:nrow(cons)){
   for(i in 1:ncol(con1)){
  weights[which(ind.cat[,i] == 1),j,1] <- con1[j,i] /ind.agg[j,i,1]}}
-for (i in 1:nrow(all.msim)){ # convert con1 weights back into aggregates
+for (i in 1:nrow(cons)){ # convert con1 weights back into aggregates
   ind.agg[i,,2]   <- colSums(ind.cat * weights[,i,num.cons+1] * weights[,i,1])}
 # test results for first row (not necessary for model)
-ind.agg[1,1:2,2] - all.msim[1,1:2] # should be zero
+ind.agg[1,1:2,2] - cons[1,1:2] # should be zero
 
 # second constraint
-for (j in 1:nrow(all.msim)){
+for (j in 1:nrow(cons)){
   for(i in 1:ncol(con2) + ncol(con1)){
-  weights[which(ind.cat[,i] == 1),j,2] <- all.msim[j,i] /ind.agg[j,i,2]}}  
-for (i in 1:nrow(all.msim)){ # convert con2 back into aggregate
+  weights[which(ind.cat[,i] == 1),j,2] <- cons[j,i] /ind.agg[j,i,2]}}  
+for (i in 1:nrow(cons)){ # convert con2 back into aggregate
 ind.agg[i,,3]   <- colSums(ind.cat * weights[,i,num.cons+1] * weights[,i,1] * weights[,i,2])}
+ind.agg[1,,3] - cons[1,]
+
+# third constraint
+for (j in 1:nrow(cons)){
+  for(i in 1:ncol(con3) + ncol(con1) + ncol(con2)){
+    weights[which(ind.cat[,i] == 1),j,3] <- cons[j,i] /ind.agg[j,i,3]}}
+for (i in 1:nrow(cons)){ # convert con3 back into aggregate
+  ind.agg[i,,4]   <- colSums(ind.cat * weights[,i,num.cons+1] * weights[,i,1] * weights[,i,2] * 
+                               weights[,i,3])}
+# test the result
+ind.agg[1:3,,4] - cons[1:3,]
 
 # for multiple iterations
 wf <- array(dim=c(dim(weights), num.its, 1)) # array to store weights its, wei
@@ -76,14 +74,13 @@ indf[,,,1,1] <- ind.agg
 
 # loop for multiple iterations (run e2.R repeatedly, saving each time)
 for(it in 2:num.its){
-source(file="e2.R")
+source(file="data/cakeMap/e2.R")
 wf[,,,it,1] <- weights
 indf[,,,it,1] <- ind.agg
 }
 
 ############## The analysis part #############
-
-a.v <- as.vector(as.matrix(all.msim)) # constraints in long form, for cor
+a.v <- as.vector(as.matrix(cons)) # constraints in long form, for cor
 g.v <- as.vector(as.matrix(indf[,,1,2,1]))
 cor(a.v,g.v)
 

@@ -1,14 +1,14 @@
 # Loading the aggregate dataset, saving as all.msim
 getwd() # should be in the smsim-course folder
-con1 <- read.csv("cakeMap/con1.csv") # age/sex variable
-con2 <- read.csv("cakeMap/con2.csv") # no car / car
-con3 <- read.csv("cakeMap/con3.csv") # ns-sec
+con1 <- read.csv("data/cakeMap/con1.csv") # age/sex variable
+con2 <- read.csv("data/cakeMap/con2.csv") # no car / car
+con3 <- read.csv("data/cakeMap/con3.csv") # ns-sec
 names(con1)
 names(con2)
 names(con3)
 
-con2 <- data.frame(cbind(con2[,2], con2[,1] - con2[,2]))
-names(con2) <- c("NoCar", "allCars")
+con2 <- data.frame(cbind(con2[,1] - con2[,2], con2[,2]))
+names(con2) <- c("Car", "NoCar")
 head(con2)
 
 sum(con1); sum(con2); sum(con3)
@@ -39,4 +39,4 @@ head(all.msim)
 
 category.labels <- names(all.msim) # define the category variables we're working with
 
-write.csv(all.msim, "cakeMap/all.msim.csv")
+write.csv(all.msim, "data/cakeMap/all.msim.csv", row.names=F)

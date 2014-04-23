@@ -6,16 +6,15 @@
 \contentsline {subsection}{\numberline {1.5}Test your understanding}{5}{subsection.1.5}
 \contentsline {subsection}{\numberline {1.6}IPF in a spreadsheet}{5}{subsection.1.6}
 \contentsline {subsection}{\numberline {1.7}IPF in R: a simple example}{6}{subsection.1.7}
-\contentsline {subsection}{\numberline {1.8}Iterations}{7}{subsection.1.8}
+\contentsline {subsection}{\numberline {1.8}Iterations}{8}{subsection.1.8}
 \contentsline {section}{\numberline {2}CakeMap: A worked example}{8}{section.2}
-\contentsline {subsection}{\numberline {2.1}Loading the input data}{8}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}Preparing the input data for IPF}{8}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Performing IPF on the CakeMap data}{8}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.1}Loading and preparing the input data}{8}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Performing IPF on the CakeMap data}{8}{subsection.2.2}
 \contentsline {section}{\numberline {3}Applying the technique in the real world}{8}{section.3}
 \contentsline {subsection}{\numberline {3.1}Model checking}{8}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Model validation}{8}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Integerisation}{8}{subsection.3.3}
-\contentsline {subsection}{\numberline {3.4}Estimating home locations}{8}{subsection.3.4}
-\contentsline {section}{\numberline {4}Glossary}{8}{section.4}
+\contentsline {subsection}{\numberline {3.2}Model validation}{9}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Integerisation}{9}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Estimating home locations}{9}{subsection.3.4}
+\contentsline {section}{\numberline {4}Glossary}{9}{section.4}
 \contentsline {section}{\numberline {5}References}{9}{section.5}
 \vspace {2em}

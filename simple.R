@@ -22,6 +22,7 @@ weights <- array(1, dim=c(nrow(ind),nrow(cons)))
 # convert survey data into aggregates to compare with census (3D matix)
 ind.agg <- matrix(rep(colSums(ind.cat), times = nrow(cons)), nrow = nrow(cons) )
 sum(sqrt((ind.agg - cons)^2)) ## the total absolute error 
+sum(sqrt((ind.agg[1,] - cons[1,])^2)) ## total absolute error for zone 1
 
 ############## The IPF part #############
 
@@ -36,7 +37,9 @@ for (i in 1:nrow(cons)){ # convert con1 weights back into aggregates
 # test results for first row (not necessary for model)
 ind.agg[1,] - cons[1,]
 sum(sqrt((ind.agg - cons)^2)) ## the total absolute error 
-weights2 <- weights
+sum(sqrt((ind.agg[1,] - cons[1,])^2)) # total absolute error for zone 1
+
+weights2 <- weights # save weights 2
 
 # Re-weighting for constraint 2 via IPF 
 for (j in 1:nrow(cons)){
@@ -44,7 +47,11 @@ for (j in 1:nrow(cons)){
  weights[which(ind.cat[,i] == 1),j] <- cons[j,i] / ind.agg[j,i]}}
 
 for (i in 1:nrow(cons)){ # convert con1 weights back into aggregates
-  ind.agg[i,]   <- colSums(ind.cat * weights2[,i] * weights[,i])}
+  weights[,i] <- weights[,i] * weights2[,i]
+  ind.agg[i,]   <- colSums(ind.cat * weights[,i])}
+weights3 <- weights
 
 ind.agg[1,] - cons[1,]
-sum(sqrt((ind.agg - cons)^2)) ## the total absolute error 
+sum(sqrt((ind.agg - cons)^2)) # the total absolute error 
+sum(sqrt((ind.agg[1,] - cons[1,])^2)) # total absolute error for zone 1
+weights3[,1] # check the weights allocated for zone 1

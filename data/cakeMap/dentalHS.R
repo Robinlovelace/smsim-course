@@ -38,9 +38,11 @@ ind$NCakes <- recode(ind$NCakes, "1='6+';
 2='3-5'; 3='1-2'; 4='<1'; 5='rarely'", as.factor.result = T)
 head(ind$NCakes)
 
+ind <- ind[-which(ind$ageband4 == 7),]
+
 head(ind$ageband4)
 ind$ageband4 <- recode(ind$ageband4, "1='16-24'; 2='25-34'; 3='35-44';
-                       4='45-54'; 5='55-64'; 6='65-74'; 7='75+'", as.factor.result = T)
+                       4='45-54'; 5='55-64'; 6='65-74'; 7='65-74'", as.factor.result = T)
 summary(ind$ageband4)
 
 ind$NSSEC8 <- as.factor(ind$NSSEC8)
@@ -49,5 +51,5 @@ summary(ind$NSSEC8)
 ind$Car <- as.factor(ind$Car)
 summary(ind$Car) # no car is 2
 
-write.csv(ind, "cakeMap/ind.csv", row.names = F)
+write.csv(ind, "data/cakeMap/ind.csv", row.names = F)
 
