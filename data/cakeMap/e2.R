@@ -4,7 +4,7 @@ ind.agg[,,1] <- ind.agg[,,4]
 # re-weighting for constraint 1 via IPF 
 for (j in 1:nrow(cons)){
   for(i in 1:ncol(con1)){
-    weights[which(ind.cat[,i] == 1),j,1] <- con1[j,i] /ind.agg[j,i,1]}}
+    weights[which(ind.cat[,i] == 1),j,1] <- con1[j,i] / ind.agg[j,i,1]}}
 for (i in 1:nrow(cons)){ # convert con1 weights back into aggregates
   ind.agg[i,,2]   <- colSums(ind.cat * weights[,i,num.cons+1] * weights[,i,1])}
 # test the result

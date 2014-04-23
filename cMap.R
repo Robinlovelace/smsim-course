@@ -3,7 +3,7 @@
 #### https://github.com/Robinlovelace/IPF-performance-testing
 ############################################
 
-num.its <- 2 # how many iterations will we run?
+num.its <- 3 # how many iterations will we run?
 
 # Loading the data: Ensure R is in the right working directory 
 ind <- read.csv("data/cakeMap/ind.csv")
@@ -78,6 +78,7 @@ source(file="data/cakeMap/e2.R")
 wf[,,,it,1] <- weights
 indf[,,,it,1] <- ind.agg
 }
+fw <- weights[,,4] * weights[,,1] * weights[,,2] *  weights[,,3] 
 
 ############## The analysis part #############
 a.v <- as.vector(as.matrix(cons)) # constraints in long form, for cor
@@ -92,10 +93,8 @@ for(it in 1:num.its){
     t1[nrow(t1)+1,] <- c(it+con/10,cor(a.v,g.v))
   }
 }
-t1
 t1$numit<-1:nrow(t1)
 
 ############## Plot the results #############
-
 # plot the increasing fit, one interation to the next 
 barplot(height=t1[,2], names.arg=t1[,1], ylim=c(t1[1,2],1), ylab=("Correlation (r)"))

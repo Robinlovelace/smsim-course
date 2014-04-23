@@ -39,4 +39,5 @@ head(all.msim)
 
 category.labels <- names(all.msim) # define the category variables we're working with
 
-write.csv(all.msim, "data/cakeMap/all.msim.csv", row.names=F)
+write.csv(all.msim, "data/cakeMap/cons.csv", row.names=F)
+
