@@ -247,19 +247,32 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 \end{table}
 
 \subsection{The IPF equation} \label{ipfeq}
+
+\begin{wrapfigure}{R}{9cm}
+   \includegraphics[width=8cm]{equation1}
+ \caption{\Cref{eq:ipf} in word form.}
+\label{feq}
+\end{wrapfigure}
+
 Using these tables we readjust the weights of the
 individuals so that their sum equals the total population of the area presented
 in Table \ref{t:s2}.
 For each constraint, the weights are multiplied
 by the aggregate level values from Table \ref{t:s} and divided by the
 respective marginal total of the microdata (see \cref{t:m}).
-This is done one constraint at a time, as described by
+This is done one constraint at a time, as described in
+\cref{feq} and more formally by
 \cref{eq:ipf} for constraint $i$ (age in this case):
+
+
 
 \begin{equation}
 w(n+1)_{ij} = \frac{w(n)_{ij} \times sT_{i}}{mT(n)_{i}}
 \label{eq:ipf}
 \end{equation}
+
+
+
 where $w(n+1)_{ij}$ is the new weight for individuals with characteristics $i$
 (age, in this case), and $j$ (sex),  $w(n)_{ij}$ is the original
 weight for individuals with these characteristics, $sT_{i}$ is element
@@ -268,6 +281,7 @@ marginal total of the small area constraint, $s$
 $j$ of the aggregated results of the weighted
 microdata, $m$ (Table \ref{t:m}).
 $n$ represents the iteration number.
+
 
 Do not worry about understanding the above equation for now.
 More important is implementing it. Follow the emboldened values in tables 1 to 4
@@ -542,7 +556,7 @@ new object called ind.cat, which converts the variables into a matrix of 0s and
 dataset. To check that the script has worked
 properly, lets count the number of individuals it contains:
 
-\begin{lstlisting}[float=h, caption={Output from ind.cat}, label=ccheck]
+\begin{lstlisting}[float=h, caption={Output from ind.cat}]
 colSums(ind.cat)
 ##    a16.49   a50.      m      f
 ##         2      3      3      2 
@@ -563,7 +577,7 @@ being, it is best to press-on with the example and understand the concepts ---
 the details can be looked at later.}
 
 \begin{lstlisting}[float=h, caption={Creating the weight and aggregated
-individual level matrices}, label=ccheck]
+individual level matrices}]
 weights <- array(1, dim=c(nrow(ind),nrow(cons)))
 ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons))
 \end{lstlisting}
@@ -573,7 +587,7 @@ to the individuals via IPF. Below is written in code the IPF formula presented
 in \cref{ipfeq}.
 
 \begin{lstlisting}[float=h, caption={Creating new weights for the individuals
-based on constraint 1 (age) via IPF}, label=ccheck]
+based on constraint 1 (age) via IPF}]
 for (j in 1:nrow(cons)){
   for(i in 1:ncol(con1)){
  weights[which(ind.cat[,i] == 1),j] <- con1[j,i] / ind.agg[j,i]}}
@@ -596,7 +610,7 @@ that obtained through mental arithmetic. Compare
 the following listing with \cref{finalout}: are the weights the same?
 
 \begin{lstlisting}[float=h, caption={W(3) after constraining by age and sex in R. 
-Compare with \cref{finalout}}, label=ccheck]
+Compare with \cref{finalout}}]
 weights3[,1] # check the weights allocated for zone 1
 ##    [1] 1.2 1.2 3.6 1.5 4.5
 \end{lstlisting}
@@ -648,10 +662,13 @@ spatial microsimulation model.
 
 \subsection{Performing IPF on the CakeMap data}
 
+\subsection{Processing the output}
+
+\subsection{Mapping the results}
 \section{Applying the technique in the real world} \label{smeval}
 Here we will continue with the cakeMap model we ran in the previous section.
 
-\subsection{Model checking}
+\subsection{Model checking and validation}
 To make an analogy with food safety standards, openness about mistakes is
 conducive to high standards \citep{Powell2011}. Transparency in model
 verification is desirable for similar reasons. The two main strategies are 1) 
@@ -663,18 +680,123 @@ A proven method of checking that data analysis and processing is working
 is wide ranging and continual visual exploration of its output
 \citep{janert2010data}.
 
-\subsection{Model validation}
-\label{meval}
-% {\color{red} Should this section be in a later chapter?} !!!
-Beyond `typos' or simple conceptual errors in model code, more fundamental
+% \subsection{Model validation}
+% \label{meval}
+% % {\color{red} Should this section be in a later chapter?} !!!
+Beyond typos or simple conceptual errors in model code, more fundamental
 questions should be asked of spatial microsimulation models. The validity
 of the assumptions on which they are built, and the confidence one should have
 in the results are important.
 
-\subsection{Integerisation} 
+\subsection{Visualising the results}
+Visualisation is an important part of communicating quantitative
+data, especially so when the datasets are large and complex so not
+conducive to description with tables or words.
 
-\subsection{Estimating home locations}
-% Apply for one zone only - just iterate after
+Because we have generated spatial data, it is useful to create 
+a map of the results, to see how it varies from place to place.
+The code used to do this found in `cMapPlot.R'. A vital function within
+this script is `merge', which is used to add the simulated cake data
+to the geographic 
+dataframe:\footnote{`join'
+is an alternative to merge from the `plyr' package also used
+in the `cMapPlot.R' script that performs the
+same task. Assuming `plyr' is loaded --- `library(plyr)' you can read
+more about join by entering `?join' in R.}
+
+\begin{lstlisting}[float=h, caption={The merge function for joining
+the spatial microsimulation results with geographic data. 
+Compare with \cref{finalout}}]
+merge(wardsF, wards@data, by = "id")
+\end{lstlisting}
+
+The above line of code by default selects all the data
+contained in the first object (`wardsF') and adds to it new variables
+from the second object based on the linking variable (in this case ``id'').
+Also in that script file you will encounter the function \verb fortify ,
+the purpose of which is to convert the spatial data object into a
+data frame. More on this process is described in \citet{Lovelace+Cheshire2013}.
+The final map result of `cakeMapPlot.R' is illustrated below (\cref{fcmap}).
+
+\begin{figure}
+ \centering
+\includegraphics[width=15cm]{cakeMap}
+\caption{Choropleth map of the spatial distribution of average frequency of
+cake consumption in West Yorkshire, based on simulated data.} 
+\label{fcmap}
+\end{figure}
+
+\subsection{Analysis}
+
+Once a spatial microdataset has been generated that we are happy with,
+we will probably want to analyse it further. This means exploring it --- its main features,
+variability and links with other datasets. To illustrate this process we will
+load an additional dataset and compare it with the
+estimates of cake consumption per person  generated in the previous
+section at the ward level.  
+
+The hypothesis we would like to test is that cake consumption is linked to deprivation:
+More deprived people will eat unheathily and cake is a relatively cheap `comfort food'.
+Assuming our simulated data is correct ---  a questionable assumption but lets roll with
+it for now --- we can explore this at the ward level thanks to a 
+\href{http://www.neighbourhood.statistics.gov.uk/dissemination/instanceSelection.do?JSAllowed=true&Function=&%24ph=61&CurrentPageId=61&step=2&datasetFamilyId=266&instanceSelection=121427&Next.x=22&Next.y=13&nsjs=true&nsck=false&nssvg=false&nswid=1920}{dataset on 
+modelled income from neighbourhood statistics}.
+
+Because the income dataset was produced for old ward boundaries (they were slightly
+modified for the 2011 census), we cannot merge with the spatial dataset based on the
+new zone codes. Instead we rely on the name of the wards. The code below provides a
+snapshot of these names and demonstrates how they can be joined using the `join' function.
+
+\begin{lstlisting}[float=h, caption={The merge function for joining
+the spatial microsimulation results with geographic data. 
+Compare with \cref{finalout}}]
+wards@data <- join(wards@data, imd)
+summary(imd$NAME %in% wards$NAME)
+##       Mode   FALSE    TRUE    NA's 
+##    logical      55      71       0 
+\end{lstlisting}
+
+The above code first joins the two datasets together and then checks the result by
+seeing how many matches names there are. In practice the fit between old names and new
+names is quite poor: only 71 out of 124. In a proper analysis we would have to solve this
+problem (e.g. via the command \verb pmatch ~ whhich stands for partial match).
+For the purposes of this excercise we will simply plot income against
+simulated cake consumption to gain a feeling what
+it tells us about the relationship between cake consumption and wealth (\cref{incomeCake}).
+
+\begin{figure}
+\centering
+ \includegraphics[width=10cm]{incomeCake}
+\caption{Relationship between modelled average ward income and
+ simulated number of cakes eaten per person per week.}
+\label{incomeCake}
+\end{figure}
+
+\section{Discussion: learning outcomes, limitations and further work}
+
+What have we learned during the course of this practical tutorial?
+Given that it was geared towards beginners, from one perspective
+one could say `not a lot' relative to the many potential applications.
+The emphasis on understanding of the basics was deliberate: it is only
+on strong foundations that large and long-lived buildings can be 
+constructed and the same applies to geographical research.
+
+The focus on strong foundations is also sensible because the
+number of people actively involved in spatial microsimulation research,
+let alone development of new software and methods, is very small.
+Specialist skills and understanding is needed to join this research area
+and a central outcome of this course has been to provide these.
+More specifically, we have learned how to:
+\begin{itemize}
+ \item Perform iterative proportional fitting, one of the commonly used
+techniques for spatial microsimulation, by hand, in a spreadsheet and in R.
+ \item 
+ \item 
+\end{itemize}
+
+
+
+
 
 \section{Glossary} \label{gloss}
 \begin{itemize}

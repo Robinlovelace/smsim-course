@@ -32,15 +32,31 @@ names(wards)
 wardsF <- merge(wardsF, wards@data, by = "id")
 head(wardsF) # see average cake consumption added
 
+# set up bounding box
+bb <- b <- bbox(wards)
+bb[1, ] <- (b[1, ] - mean(b[1, ])) * 1.05 + mean(b[1, ])
+bb[2, ] <- (b[2, ] - mean(b[2, ])) * 1.05 + mean(b[2, ])
+b[1, ] <- (b[1, ] - mean(b[1, ])) * 1.7 + mean(b[1, ])
+b[2, ] <- (b[2, ] - mean(b[2, ])) * 1.7 + mean(b[2, ])
+
+
 # map the result!
-ggplot() + geom_polygon(data=wardsF, aes(long, lat, group=group, fill=avCake), color = "black", alpha=0.6) 
+ggplot() + 
+  geom_polygon(data=wardsF, aes(long, lat, group=group, fill=avCake), color = "black", alpha=0.2)
 library(ggmap)
 library(rgdal)
-baseMap <- get_map(location=bbox(wards))
-ggmap(baseMap) + 
-  geom_polygon(data=wardsF, aes(long, lat, group=group, fill=avCake), color = "black", alpha=0.5) +
-  scale_fill_continuous(low = "green", high = "red")
+baseMap <- get_map(location=bb, maptype="terrain")
+# baseMap <- get_map(location=b, zoom=10, source='osm')
+#  baseMap <- get_map(location=b, source='stamen')
 
+ggmap(baseMap) + 
+  geom_polygon(data=wardsF, aes(long, lat, group=group, fill=avCake), alpha=0.5) + 
+  geom_path(data=wardsF, aes(long, lat, group=group), color="black", alpha=0.3) +
+  scale_fill_continuous(low = "green", high = "red") + xlim(bb[1,]) + ylim(bb[2,]) + 
+  theme_nothing()
+## ggsave("figures/cakeMap.png")
+
+# analysis
 imd <- read.csv("data/cakeMap/inc-est-2001.csv")
 head(imd)
 head(join(wards@data, imd))
