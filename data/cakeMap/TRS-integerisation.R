@@ -39,4 +39,5 @@ summary(fw[ints[[i]],i]) # Summary statistics of all IPF weights for SELECTED IN
 summary(fw[ints[[i]][which(duplicated(ints[[i]]) == T)],i]) # Summary statistics of replicated weights in zone 1 (mean should be higher still)
 object.size(intall) / 1000000
 object.size(intagg)
+
 head(pops)

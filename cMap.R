@@ -61,8 +61,7 @@ for (j in 1:nrow(cons)){
 for (i in 1:nrow(cons)){ # convert con3 back into aggregate
   ind.agg[i,,4]   <- colSums(ind.cat * weights[,i,num.cons+1] * weights[,i,1] * weights[,i,2] * 
                                weights[,i,3])}
-# test the result
-ind.agg[1:3,,4] - cons[1:3,]
+ind.agg[1:3,,4] - cons[1:3,] # test the result
 
 # for multiple iterations
 wf <- array(dim=c(dim(weights), num.its, 1)) # array to store weights its, wei
@@ -98,3 +97,4 @@ t1$numit<-1:nrow(t1)
 ############## Plot the results #############
 # plot the increasing fit, one interation to the next 
 barplot(height=t1[,2], names.arg=t1[,1], ylim=c(t1[1,2],1), ylab=("Correlation (r)"))
+source("data/cakeMap/TRS-integerisation.R") # creates integer output (intall) and cakes
