@@ -58,7 +58,10 @@ ggmap(baseMap) +
 
 # analysis
 imd <- read.csv("data/cakeMap/inc-est-2001.csv")
-head(imd)
+summary(imd$NAME %in% wards$NAME)
+summary(pmatch(wards$NAME, imd$NAME))
+which(imd$NAME %in% wards$NAME) %in% pmatch(wards$NAME, imd$NAME)
 head(join(wards@data, imd))
 wards@data <- join(wards@data, imd)
 plot(wards$Avinc, wards$avCake)
+cor(wards$Avinc, wards$avCake, use='complete.obs')
