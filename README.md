@@ -3,6 +3,8 @@ An introduction to spatial microsimulation using R
 
 This `smsim-course` repository is the online home of teaching materials dedicated to a statistical technique known as spatial microsimulation.
 
+
+
 The [website of the course](http://www.robinlovelace.net/smsim-course),
 which has been designed to aid face-to-face teach, but which may be of use to distance learners,
 offer more details about this repository and the course itself. Overall, the aim is to provide a solid introduction to
