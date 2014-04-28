@@ -100,8 +100,9 @@ the top right and the `Files' tab at the top of the left hand window.}
 \end{wrapfigure}
 
 Once the folder has been successfully extracted open it in
-your browser and take a look around. You will sub-folders
-entitled `cakeMap', `data', `figures' and `rcode'. When you get to the
+your browser and take a look around. You will find a number of files
+and two sub-folders
+entitled `data', and `figures'. When you get to the
 sections that use R code, it is useful for R to operate from
 within the smsim-course-master folder. Probably the best way
 to set this up is to open the file `smsim-course.Rproj' from
@@ -432,7 +433,7 @@ cons <- read.csv("data/simple/cons.csv") # load aggregate constraints
 
 To check that the \emph{data frames} have loaded correctly, simply
 ask R to print their contents by entering the object's name. To display the
-individual level data, for example simply type the
+individual level data, for example, simply type the
 following:\footnote{An alternative
 way to do this is to click on the object's name in the `Environment' tab in
 RStudio's top right window.}
@@ -452,15 +453,15 @@ Note that the input data is identical to the tables illustrated above for
 consistency. Instead of constraining for just one zone as we did in the example
 above, we will fit the data to six zones here. To subset a dataset, add square
 brackets to the end of the object's name in R. Entering \verb cons[1:2,] ,
-for example should output the first two rows of the constraint variable:
-within the square brackets the number before the comma refers to columns (blank
+for example, should output the first two rows of the constraint variable.
+Within the square brackets the number before the comma refers to columns (blank
 means all columns) and the numbers after the comma refer to rows. If the output
 of this command looks like the text below, congratulations are in order:
 you have successfully loaded the constraint dataset.
 
 \begin{lstlisting}[float=h, caption={Printing a subset of the constraint data
 in R},
-label=cout]
+label=cou]
 cons[1:2,]
 ##    X16.49 X50. m f
 ##  1      8    4 6 6
@@ -641,7 +642,7 @@ we progress to a more complex example, CakeMap.
 \section{CakeMap: A worked example}
 
 In this section we will process real data to arrive at an important result:
-an estimate of the amount of cake eaten in different wards in Leeds. The
+an estimate of the amount of cake eaten in different wards in West Yorkshire. The
 example is deliberately rather absurd: hopefully this will make
 the technique more memorable. An attempt has been made to present the method
 in a generalisable was as possible, allowing users to apply the technique described
@@ -661,6 +662,61 @@ similar steps will be needed to use your own data as an input into a
 spatial microsimulation model.
 
 \subsection{Loading and preparing the input data}
+
+The raw constraint variables for CakeMap were downloaded from
+the Infuse website (\href{http://infuse.mimas.ac.uk/}{infuse.mimas.ac.uk/}).
+These, logically enough, are stored in the `cakeMap/data/' directory
+as .csv files and contain the word `raw' so it is clear which files
+contain the raw data. The file `age-sex-raw.csv', for example is the raw
+age and sex data that was downloaded. As the screenshot in \cref{fraw} shows,
+it was provided in a rather verbose form and needed to be
+processed before it could be usefully used as an input
+in a spatial microsimulation model. `con1.csv' stands for
+`constraint 1' and represents this age/sex data after it has been processed.
+
+\begin{figure}
+ \includegraphics[width=12cm]{raw-data-screenshot}
+\caption{The raw input data for the CakeMap model, downloaded from the InFuse website.}
+\label{fraw}
+\end{figure}
+
+
+To ensure reproducibility in the process of converting the raw data into
+this `spatial microsimulation ready' dataset, all of the steps used to
+clean and rearrange the data have been saved. Take a look at the R script file
+`process-age.R' --- these are the kinds of steps that the researcher will need to
+undertake before performing a spatial microsimulation model. 
+Here is not the place to delve into the details of data reformatting;
+there are resources dedicated to that \citep{tidy-data, kabacoff2011r}.
+However, it is worth taking a look at the `process-age.R' script and the
+other `process*' files to gain insight into how R can be used to quickly
+and effectively be used to process complex raw data into a form that is
+ready for use in modelling work.
+
+The input data generated through this process of data preparation are named
+`con1.csv' to `con3.csv'. For simplicity, all these were merged into a single
+dataset called `cons.csv'. All the input data for this section
+are loaded with the following commands:
+
+
+\begin{lstlisting}[float=h, caption={Loading the input data for CakeMap (see `cMap.R')}]
+ind <- read.csv("data/cakeMap/ind.csv")
+cons <- read.csv("data/cakeMap/cons.csv")
+\end{lstlisting}
+
+Take a look at these input data using the techniques learned in the previous
+section. To test your understanding, try to answer the following questions:
+what are the constraint variables? How many individuals are in the survey microdataset?
+How many zones will we generate spatial microdata for?
+
+For bonus points that will test your R skills as well as your practical knowledge
+of spatial microsimulation, try constructing queries in R that will automatically
+answer these questions.
+
+It is vital to understand the input datasets before trying to model them, so
+take some time exploring the input. Only when satisfied with your understanding of
+the datasets (a pen and paper can help here, as well as R!) is it time
+to move on to generate the spatial microdata using IPF.
 
 \subsection{Performing IPF on the CakeMap data}
 
@@ -717,12 +773,12 @@ contained in the first object (`wardsF') and adds to it new variables
 from the second object based on the linking variable (in this case ``id'').
 Also in that script file you will encounter the function \verb fortify ,
 the purpose of which is to convert the spatial data object into a
-data frame. More on this process is described in \citet{Lovelace+Cheshire2013}.
+data frame. More on this process is described in \citet{lovelace2014introduction}.
 The final map result of `cakeMapPlot.R' is illustrated below (\cref{fcmap}).
 
 \begin{figure}
  \centering
-\includegraphics[width=15cm]{cakeMap}
+\includegraphics[width=12cm]{cakeMap}
 \caption{Choropleth map of the spatial distribution of average frequency of
 cake consumption in West Yorkshire, based on simulated data.} 
 \label{fcmap}
@@ -768,13 +824,35 @@ it tells us about the relationship between cake consumption and wealth (\cref{in
 
 \begin{figure}
 \centering
- \includegraphics[width=10cm]{incomeCake}
+ \includegraphics[width=7cm]{incomeCake}
 \caption{Relationship between modelled average ward income and
  simulated number of cakes eaten per person per week.}
 \label{incomeCake}
 \end{figure}
 
-\section{Discussion: learning outcomes, limitations and further work}
+The question raised by this finding is: why? 
+Not why is cake consumption higher in wealthy areas (this has not
+been established) but: why has the model resulted in this correlation?
+To explore this question we need to go back and look at the individual
+level data. The most relevant constraint variable for income was class.
+When we look at the relationship between social class and cake consumption
+in the Dental Health Survey, we find that there is indeed a link:
+individuals in the highest three classes (1.1, 1.2, 2) have an average
+cake intake of 3.9 cakes per week whereas the three lowest classes have
+an average intake of 3.7. This is a relatively modest difference but,
+when averaging over large areas, it helps explain the result.
+The class dependence of cake consumption in the Dental Health Survey is
+illustrated in \cref{hm}.
+
+\begin{figure}
+\centering
+ \includegraphics[width=11cm]{hm}
+\caption{Relationship between social class and cake consumption in the
+individual level data.}
+\label{hm}
+\end{figure}
+
+\section{Discussion}
 
 What have we learned during the course of this practical tutorial?
 Given that it was geared towards beginners, from one perspective
@@ -792,18 +870,96 @@ More specifically, we have learned how to:
 \begin{itemize}
  \item Perform iterative proportional fitting, one of the commonly used
 techniques for spatial microsimulation, by hand, in a spreadsheet and in R.
- \item 
- \item 
+ \item Iterate the process any number of times using pre-made R code.
+ \item Use simple queries and visuals to check the process has worked as expected.
+ \item Process the spatial microdata to create estimates of target variables and
+join this with output with geographics zones.
+ \item Map the result and begin to look for explanation in the dataset.
 \end{itemize}
 
+One important thing that the cakeMap example should have taught you is
+about the dangers and limitations of using spatial microsimulation.
+Most of the people who read articles based on the spatial microsimulation
+will not understand the technical details of the method. Therefore, great
+care must be taken not to mislead.
 
+It is, for example, untrue to say
+that we have demonstrated cake consumption to be higher in wealthy areas of Leeds.
+We have done nothing of the sort! We have merely created a synthetic individual-level
+dataset for Leeds based on 3 constraint variables and allocated these individuals to zones.
+This spatial microdataset is not `real'. We can have a high level of confidence that the
+values for the constraint variables are correct for this spatial microdataset but the joint distribution
+(e.g. the cross tabulation between age and car ownership) will tend towards the average
+contained within the survey microdataset and is likely to mask regional variability. In an ward
+where the proportion of young drivers is very high, for example, our model result is likely
+to provide underestimates of the numbers of young people owning cars whilst overestimating
+the number of older people owning cars.
 
+The estimates generated for the target variable --- cake consumption --- are likely to be
+even further from reality. They simply reflect the relationship between cake consumption and
+a selection of constraint variables at the national level. Do we have good evidence to suggest
+that age/sex, socio-economic class and household car ownership are good proxies of cake consumption
+across different parts of the country? No. So we should treat the results as what they are:
+an amusing example of what you can do with spatial microsimulation, not a reliable description
+of the real world. To validate this example we would need to conduct some kind of randomised
+survey in the target wards to identify whether cake consumption really does vary in the ways
+described by the model. Most likely we would find that it does not.
 
+This brings us nicely on to the final point of discussion: how you use spatial microsimulation in
+your own research. This of course is up to you, but during the process of this course we hope that
+you have picked up some ideas about best practice in the field. These include:
+\begin{itemize}
+ \item Ensure, to the extent possible, \textbf{reproducibility in your method and findings}. This includes, at a minimum,
+clear description of the input data, explanation of the method used and the software needed. As illustrated
+with the cakeMap example, it is now relatively easy to ensure complete reproducibility even in complex analyses.
+This will not always be possible due to confidentiality of input data. However, the creation of an example dataset
+and provision of code should always be possible. This is highly recommended as it will greatly help others reproduce
+your findings (improving the scientific credibility of your research), provide a learning opportunity for yourself and
+others and increase the probability of other academics citing your work.
+ \item Use spatial microsimulation only when it is the \textbf{most appropriate tool for the job}. 
+This means that if there are alternatives such as geographically weighted regression analysis
+or analysis of large secondary datasets, these should be considered beforehand. Generating an entirely
+new individual-level dataset is not to be taken lightly and risks distracting from more grounded research.
+Thus it should be seen as an \emph{addition to} rather than a \emph{replacement for} more established methods.
+\item When spatial microsimulation is used, \textbf{be transparent about its underlying assumptions and limitations}.
+Simply forgetting to include the word `simulated' in the caption of \cref{fcmap}, for example, could lead
+the reader to believe it is actual cake consumption that is being described. In the case
+of a cakeMap this may not matter but in areas of public health and the environment the consequences
+of such oversight could be deadly.
+\end{itemize}
+
+Underlying each of these points is a wider responsibility: to communicate one's research
+with clarity and transparency. Too much modelling research is shrouded in a cloud of jargon,
+unstated assumptions and verbose English. If nothing else, this tutorial should
+provide guidance on how to improve standards in the field and move towards best practice
+for reproducibility (see \citep{Peng2006})
+
+Spatial microsimulation is a powerful tool.
+Like any powertool, it can acheive very useful results for its user
+but can also cause great harm if used incorrectly. 
+Think of a pneumatic drill: this could be used to build new
+public infrastructure such as bicycle paths. It could also,
+in clumsy hands, be used to destroy existing infrastructure.
+The same applies to spatial microsimulation:
+at best it can greatly help out with complex research questions such
+as the distributional impacts of new transport policies \citep{Lovelace2014-jtg}.
+At worst, it can waste valuable research time, create misleading results
+and shroud academic research behind an impenetrable wall of jargon.
+
+We have little doubt that the vast majority of
+people will the former option. This course has hopefully
+equipped its students with
+the tools to pursue this lofty aim.
 
 \section{Glossary} \label{gloss}
 \begin{itemize}
 \item \textbf{Algorithm}: a series of computer commands which are executed in a well
 defined order. Algorithms process input data and produce an output.
+\item \textbf{Combinatorial optimisation} is an approach to spatial microsimulation that
+generates spatial microdata by randomly selecting individuals from a survey dataset 
+and measuring the fit between the simulated output and the constraint variables.
+If the fit improves after any particular change, the change is kept.
+\citet{Williamson2007} provides a practical user manual for implementing the technique in code.
 \item \textbf{Data frame}: a type of object (formally referred to as a class)
 in R, data frames are square tables composed of rows and columns of
 information. As with many things in R, the best way to understand dataframes is
@@ -815,7 +971,11 @@ variables: name and height:
 Note that each new variable is entered using the command \verb c() . This is
 how R creates objects with the \emph{vector} data class --- a one dimensional
 matrix --- and that text data must be entered in quote marks.
-
+\item \textbf{Deterministic reweighting} is an approach to generating spatial
+microdata that allocates fractional weights to individuals based on how representative
+they are of the target area. It differs from combinatorial optimisation approaches in
+that it requires no random numbers. The most frequently used method of deterministic
+reweighting is IPF.
 \item \textbf{Iteration}: one instance of a process that is repeated many times until
 a predefined end point, often within an \emph{algorithm}.
  \item \textbf{Iterative proportional fitting} (IPF): an iterative process implemented in
@@ -828,17 +988,15 @@ can be defined as \emph{a statistical technique for allocating weights to indivi
 on how representative they are of different zones}. IPF is a type of deterministic reweighting,
 meaning that random numbers are not needed to generate the result and that the output weights are real (not
 integer) numbers.
-\item \textbf{Iteration}
 \end{itemize}
 
 
-\label{Bibliography}
 % \lhead{\emph{Bibliography}}  % Change the left side page header to
 % \fancyhead[LO,RE]{\emph{Bibliography}}
 \bibliographystyle{model2-names}  % Use the "unsrtnat" BibTeX style for
 % \bibliography{library, lincluded}  % The references (bibliography) information are stored
-\bibliography{Microsimulation.bib}  \label{Bibliography}
-% /nfs/foe-fs-01_users/georl/Documents/Microsimulation,
+\bibliography{/nfs/foe-fs-01_users/georl/Documents/Microsimulation.bib}  \label{Bibliography}
+% ,Microsimulation.bib
 % /home/robin/Documents/Microsimulation.bib
 
 \addtocontents{toc}{\vspace{2em}}  % Add a gap in the Contents, for aesthetics

@@ -52,7 +52,7 @@ baseMap <- get_map(location=bb, maptype="terrain")
 ggmap(baseMap) + 
   geom_polygon(data=wardsF, aes(long, lat, group=group, fill=avCake), alpha=0.5) + 
   geom_path(data=wardsF, aes(long, lat, group=group), color="black", alpha=0.3) +
-  scale_fill_continuous(low = "green", high = "red") + xlim(bb[1,]) + ylim(bb[2,]) + 
+  scale_fill_continuous(low = "green", high = "red", name = "Simulated\naverage\nfreqency\nof cake\nconsumption\n(times/wk)") + xlim(bb[1,]) + ylim(bb[2,]) + 
   theme_minimal()
 ## ggsave("figures/cakeMap.png")
 
@@ -65,3 +65,29 @@ head(join(wards@data, imd))
 wards@data <- join(wards@data, imd)
 plot(wards$Avinc, wards$avCake)
 cor(wards$Avinc, wards$avCake, use='complete.obs')
+
+# individual level analysis
+levels(ind$NCakes)
+ind$NCakes <- factor(ind$NCakes, c("<0.5", levels(ind$NCakes)[c(1,2,3,4)]))
+levels(ind$NCakes)
+ind$avnumcakes <- 1
+ind$avnumcakes[ind$NCakes == levels(ind$NCakes)[1]] <- 0.1
+ind$avnumcakes[ind$NCakes == levels(ind$NCakes)[2]] <- 0.5
+ind$avnumcakes[ind$NCakes == levels(ind$NCakes)[3]] <- 1.5
+ind$avnumcakes[ind$NCakes == levels(ind$NCakes)[4]] <- 4
+ind$avnumcakes[ind$NCakes == levels(ind$NCakes)[5]] <- 8
+summary(ind$avnumcakes)
+ind$NSSEC8 <- as.character(ind$NSSEC8)
+aggregate(ind$avnumcakes ~ ind$NSSEC8, FUN=mean)
+summary(ind$avnumcakes)
+mean(ind$avnumcakes[ ind$NSSEC8 == "1.1" | ind$NSSEC8 == "1.2" | ind$NSSEC8 == "2" ])
+mean(ind$avnumcakes[ ind$NSSEC8 == "8" | ind$NSSEC8 == "7" | ind$NSSEC8 == "6" ])
+
+(hm  <-  table(ind$NCakes, ind$NSSEC8))
+heatmap(hm)
+heatmap(hm, Rowv=NA, Colv=NA)
+library(gplots)
+heatmap.2(hm, Rowv=NA, Colv=NA, xlab = "Socio-economic class", ylab = "Frequency of cake consumption")
+hmm <- melt(hm)
+ggplot(hmm) + geom_tile(aes(Var1, as.character(Var2), fill = value)) +
+  scale_fill_continuous(low="green", high="red")
