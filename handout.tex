@@ -1,5 +1,3 @@
-% comments, comments, comments
-
 \documentclass[a4paper, 11pt, twoside]{article}  
 \usepackage[hcentering,bindingoffset=10mm,margin=20mm]{geometry}
 \usepackage{graphicx}
@@ -163,8 +161,8 @@ Let's start with a very basic dataset. To aid understanding, we will first do
 the reweighting by hand
 to understand the process before automating it on the computer.
 Table \ref{t:w} shows 5 individuals, who are defined by two
-constraint variables: age and sex.
-Table \ref{t:s} contains data for a hypothetical area. \Cref{t:s2} illustrates
+constraint variables: age and sex. This is analguous to the survey data shown in Figure~\ref{fmsim-schema}.
+Table \ref{t:s} contains data for a hypothetical area. This is analguous to the geographically aggregated 'wide' data shown in Figure~\ref{fmsim-schema}. \Cref{t:s2} illustrates
 this aggregate level table in a different form,
 to show our ignorance of interaction between age and sex. Finally, table
 \ref{t:m} presents the hypothetical microdata in aggregated form,
@@ -173,7 +171,7 @@ Table \ref{t:s2}.
 
 \begin{table}[h]
 % {r}{10cm}
-\caption{A hypothetical input microdata set
+\caption{A hypothetical input microdata set (`Survey data')
 % (the original
 % weights set to one). The bold value is used subsequently for
 % illustrative purposes.
@@ -201,7 +199,7 @@ Table \ref{t:s2}.
 
 \begin{table}[H]
 \centering{
-\caption{Small area constraints ($s$). \label{t:s}}
+\caption{Small area constraints ($s$) (Geographically aggregated `wide' data). \label{t:s}}
 \begin{tabular}{cllll}
 \toprule
 Constraint $\Rightarrow$ & \multicolumn{2}{c}{$i$}& \multicolumn{2}{c}{$j$}\\
@@ -995,7 +993,7 @@ integer) numbers.
 % \fancyhead[LO,RE]{\emph{Bibliography}}
 \bibliographystyle{model2-names}  % Use the "unsrtnat" BibTeX style for
 % \bibliography{library, lincluded}  % The references (bibliography) information are stored
-\bibliography{/nfs/foe-fs-01_users/georl/Documents/Microsimulation.bib}  \label{Bibliography}
+\bibliography{Microsimulation}  \label{Bibliography}
 % ,Microsimulation.bib
 % /home/robin/Documents/Microsimulation.bib
 
