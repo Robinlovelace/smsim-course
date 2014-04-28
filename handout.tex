@@ -249,11 +249,11 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 
 \subsection{The IPF equation} \label{ipfeq}
 
-\begin{wrapfigure}{R}{9cm}
-   \includegraphics[width=8cm]{equation1}
- \caption{\Cref{eq:ipf} in word form.}
-\label{feq}
-\end{wrapfigure}
+% \begin{wrapfigure}{R}{9cm}
+%    \includegraphics[width=8cm]{equation1}
+%  \caption{\Cref{eq:ipf} in word form.}
+% \label{feq}
+% \end{wrapfigure}
 
 Using these tables we readjust the weights of the
 individuals so that their sum equals the total population of the area presented
@@ -262,8 +262,13 @@ For each constraint, the weights are multiplied
 by the aggregate level values from Table \ref{t:s} and divided by the
 respective marginal total of the microdata (see \cref{t:m}).
 This is done one constraint at a time, as described in
-\cref{feq} and more formally by
+\cref{eq:ipf-word} and more formally by
 \cref{eq:ipf} for constraint $i$ (age in this case):
+
+\begin{equation}
+  Weight_{New} = Weight_{Current} \times \frac{Survey_{Constraint \; Total}}{Census_{Constraint \; Total}}
+\label{eq:ipf-word}
+\end{equation}
 
 
 
