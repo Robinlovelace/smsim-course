@@ -319,7 +319,23 @@ Total & & & 5 & 12 \\
 \label{t:new-weights}
 \end{table}
 
-After the individual level data have been re-aggregated (\cref{t:m2}),
+The next stage is to re-aggregate the individual-level data,
+to compare the marginal totals with the constraint tables
+ready for the second constraint --- this will result in
+\cref{t:m2}. To generate this table, the new weights ($w(2)$,
+presented in \cref{t:new-weights}) are multiplied by the 
+number of individuals in each category. Thus, to calculate the new
+estimate for the number of males we multiply the weight of
+males under 50 (4 --- follow the emboldened values above) by the
+number of individuals in this category (1) and add the corresponding values
+for males over 50 ($\frac{4}{3}$ and 2). This is as follows
+(see the bold value in the bottom left of \cref{t:m2}):
+
+\begin{equation}
+\sum_{i = male} m(2) \; = \; \textbf{ 4} \times \textbf{1} + \frac{4}{3} \times 2 \; =  \; \textbf{4} + \frac{8}{3} \; = \textbf{6} \frac{\textbf{2}}{\textbf{3}}
+\end{equation}
+
+After performing this process of re-aggregation (\cref{t:m2}) for all categories,
 the next stage is to repeat \cref{eq:ipf} for the age constraint to generate a
 third set of weights, by replacing
 the $i$ in $sT_{i}$ and $mT(n)_{i}$ with $j$ and incrementing the value of n:
