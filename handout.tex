@@ -13,6 +13,8 @@
 \usepackage{float} % allows forcing of float position
 % \restylefloat{table}
 \usepackage{bm}
+\usepackage[parfill]{parskip}
+% begins paragraphs with an empty line rather than an indent
 
 % Add toc to contents
 \usepackage[nottoc,numbib]{tocbibind}
@@ -158,16 +160,13 @@ microsimulation. \label{fmsim-schema}}
 \subsection{Some input data} \label{s:theory}
 
 Let's start with a very basic dataset. To aid understanding, we will first do
-the reweighting by hand
-to understand the process before automating it on the computer.
-Table \ref{t:w} shows 5 individuals, who are defined by two
-constraint variables: age and sex. This is analguous to the survey data shown in Figure~\ref{fmsim-schema}.
-Table \ref{t:s} contains data for a hypothetical area. This is analguous to the geographically aggregated 'wide' data shown in Figure~\ref{fmsim-schema}. \Cref{t:s2} illustrates
-this aggregate level table in a different form,
-to show our ignorance of interaction between age and sex. Finally, table
-\ref{t:m} presents the hypothetical microdata in aggregated form,
-that can be compared directly to the aggregate data presented in
-Table \ref{t:s2}.
+the reweighting by hand to understand the process before automating it on the computer later. As outlined in Figure~\ref{fmsim-schema}, there are two input files required to perform spatial microsimulation:
+\begin{itemize}
+  \item Survey data - information about individuals
+  \item Geographically aggregated (`wide') data - typically aggregated Census tables
+\end{itemize}
+
+Table \ref{t:w} shows 5 individuals, who are defined by two constraint variables: age and sex. This is analguous to the survey data shown in Figure~\ref{fmsim-schema}. Table \ref{t:m} presents this same data in aggregated form, whose margin totals can be used in the IPF procedure described shortly.
 
 \begin{table}[h]
 % {r}{10cm}
@@ -197,6 +196,26 @@ Table \ref{t:s2}.
 \end{center}
 \end{table}
 
+\begin{table}[htbp]
+\centering
+\caption[The aggregated results of the weighted
+microdata set]{The aggregated results of the weighted
+microdata set ($m(1)$).
+Note, these values depend on the current weight so change after each iteration; this table is for the initial weight.}
+
+\begin{tabular}{cllll}\toprule
+Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
+& Age/sex & Male & Female & T\\ \midrule
+\multirow{2}{*}{$i$} & Under-50 & \textbf{1} & 1 & \textbf{2}\\
+& Over-50 & 2 & 1 &3 \\
+& T & 3 & 2 &5\\
+\bottomrule
+\end{tabular}
+\label{t:m}
+\end{table}
+
+Table \ref{t:s} contains data for a hypothetical area. This is analguous to the geographically aggregated 'wide' data shown in Figure~\ref{fmsim-schema}.
+
 \begin{table}[H]
 \centering{
 \caption{Small area constraints ($s$) (Geographically aggregated `wide' data). \label{t:s}}
@@ -209,7 +228,8 @@ Area $\Downarrow$  & Under-50 & Over-50 &  Male & Female\\
 \bottomrule
 \end{tabular}}
 \end{table}
-\vspace{1cm}
+
+\Cref{t:s2} illustrates this aggregate level table in a different form, to show our ignorance of interaction between age and sex for this geography.
 
 \begin{table}[h]
 \centering
@@ -227,25 +247,7 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 \label{t:s2}
 \end{table}
 
-\begin{table}[htbp]
-\centering
-\caption[The aggregated results of the weighted
-microdata set]{The aggregated results of the weighted
-microdata set ($m(1)$).
-Note, these values depend on the
-weights allocated in Table \ref{t:w} and therefore
- change after each iteration}
-
-\begin{tabular}{cllll}\toprule
-Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
-& Age/sex & Male & Female & T\\ \midrule
-\multirow{2}{*}{$i$} & Under-50 & \textbf{1} & 1 & \textbf{2}\\
-& Over-50 & 2 & 1 &3 \\
-& T & 3 & 2 &5\\
-\bottomrule
-\end{tabular}
-\label{t:m}
-\end{table}
+With our input data in place, we can begin our first iteration.
 
 \subsection{The IPF equation} \label{ipfeq}
 
@@ -255,29 +257,29 @@ Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 % \label{feq}
 % \end{wrapfigure}
 
-Using these tables we readjust the weights of the
-individuals so that their sum equals the total population of the area presented
-in Table \ref{t:s2}.
-For each constraint, the weights are multiplied
-by the aggregate level values from Table \ref{t:s} and divided by the
-respective marginal total of the microdata (see \cref{t:m}).
-This is done one constraint at a time, as described in
-\cref{eq:ipf-word} and more formally by
-\cref{eq:ipf} for constraint $i$ (age in this case):
+Using the tables about we readjust the weights of the
+individuals so that:
+
+\begin{itemize}
+  \item If there are exactly the same number of 
+  \item Individuals who are rare in the geography of interest are given a smaller weight (we need fewer of them).
+  \item Individuals who are common in the geography of interest are given a larger weight (we need more of them).
+  \item Their sum equals the total population of the geography of interest (12 in our example).
+\end{itemize}
+
+For each constraint (age or sex for example), the current weight is multiplied
+by the respective total from the geographically aggregated table (Table~\ref{t:s}) and divided by the
+corresponding marginal total of the survey data (see \cref{t:m}). This is done one constraint at a time, as described in \cref{eq:ipf-word} and more precisely by \cref{eq:ipf} for constraint $i$ (age in this case):
 
 \begin{equation}
-  Weight_{New} = Weight_{Current} \times \frac{Survey_{Constraint \; Total}}{Census_{Constraint \; Total}}
+  Weight_{New} = Weight_{Current} \times \frac{Survey_{Constraint \: Total}}{Census_{Constraint \: Total}}
 \label{eq:ipf-word}
 \end{equation}
-
-
 
 \begin{equation}
 w(n+1)_{ij} = \frac{w(n)_{ij} \times sT_{i}}{mT(n)_{i}}
 \label{eq:ipf}
 \end{equation}
-
-
 
 where $w(n+1)_{ij}$ is the new weight for individuals with characteristics $i$
 (age, in this case), and $j$ (sex),  $w(n)_{ij}$ is the original
@@ -288,6 +290,7 @@ $j$ of the aggregated results of the weighted
 microdata, $m$ (Table \ref{t:m}).
 $n$ represents the iteration number.
 
+After creating $Weight_{New}$, the individual level data is recreated before the next weight can be calculated using the next constraint.
 
 Do not worry about understanding the above equation for now.
 More important is implementing it. Follow the emboldened values in tables 1 to 4
