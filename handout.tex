@@ -206,7 +206,7 @@ Note, these values depend on the current weight so change after each iteration; 
 \begin{tabular}{cllll}\toprule
 Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 & Age/sex & Male & Female & T\\ \midrule
-\multirow{2}{*}{$i$} & Under-50 & \textbf{1} & 1 & \textbf{2}\\
+\multirow{2}{*}{$i$} & Under-50 & \textbf{1} & 1 & \textbf{\color{blue}2}\\
 & Over-50 & 2 & 1 &3 \\
 & T & 3 & 2 &5\\
 \bottomrule
@@ -224,7 +224,7 @@ Table \ref{t:s} contains data for a hypothetical area. This is analguous to the 
 Constraint $\Rightarrow$ & \multicolumn{2}{c}{$i$}& \multicolumn{2}{c}{$j$}\\
 Category $\Rightarrow$ & $i_1$ & $i_2$ & $j_1$ & $j_2$ \\
 Area $\Downarrow$  & Under-50 & Over-50 &  Male & Female\\
-1  & \textbf{8} & 4 & 6 & 6\\
+1  & \textbf{\color{blue}8} & 4 & 6 & 6\\
 \bottomrule
 \end{tabular}}
 \end{table}
@@ -239,7 +239,7 @@ values to be estimated.}
 \begin{tabular}{cllll}\toprule
 Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
 & Age/sex & Male & Female & T\\ \midrule
-\multirow{2}{*}{$i$} & Under-50 & \textbf{?} & ? & \textbf{8}\\
+\multirow{2}{*}{$i$} & Under-50 & \textbf{?} & ? & \textbf{\color{blue}8}\\
 & Over-50 & ? & ? &4 \\
 & T & 6 & 6 &12\\
 \bottomrule
@@ -261,18 +261,35 @@ Using the tables about we readjust the weights of the
 individuals so that:
 
 \begin{itemize}
-  \item If there are exactly the same number of 
+% \item If there are exactly the same number of 
   \item Individuals who are rare in the geography of interest are given a smaller weight (we need fewer of them).
   \item Individuals who are common in the geography of interest are given a larger weight (we need more of them).
   \item Their sum equals the total population of the geography of interest (12 in our example).
 \end{itemize}
 
-For each constraint (age or sex for example), the current weight is multiplied
-by the respective total from the geographically aggregated table (Table~\ref{t:s}) and divided by the
-corresponding marginal total of the survey data (see \cref{t:m}). This is done one constraint at a time, as described in \cref{eq:ipf-word} and more precisely by \cref{eq:ipf} for constraint $i$ (age in this case):
+For each constraint the current weight is multiplied by the respective total from the geographically aggregated (Census) table (Table~\ref{t:s}) and divided by the corresponding marginal total of the survey data (see \cref{t:m}). For example, using the age constraint the weight for under 50 is calculated as follows: the initial weight is arbitrary, and set as 1; the number of individuals in the geographically aggregated (Census) data is 8; and the number of individuals under 50 in the survey data is 2. These are the figures highlighted in \textbf{\color{blue}bold and blue} in the preceeding tables. Thus:
+
+\begin{table}[htbp]
+\centering
+\caption{Partially complete rewighting, using under 50 as an example.}
+\begin{tabular}{lllll}
+\toprule
+{Individual} & {Sex} & {age-group} & {Weight} &
+{New weight, $w_{2}$} \\ \midrule
+1 & Male & Over-50 & 1 & --- \\
+2 & Male & Over-50 & 1 & --- \\
+3 & Male & Under-50 & 1 & $1 \times \frac{\color{blue}8}{\color{blue}2} = 4$ \\
+4 & Female & Over-50 & 1 & --- \\
+5 & Female & Under-50 & 1 & $1 \times \frac{\color{blue}8}{\color{blue}2} = 4$ \\
+\bottomrule
+\end{tabular}
+\label{t:new-weights}
+\end{table}
+
+This is done one constraint at a time, as described in \cref{eq:ipf-word} and more precisely by \cref{eq:ipf} for constraint $i$ (age in this case):
 
 \begin{equation}
-  Weight_{New} = Weight_{Current} \times \frac{Survey_{Constraint \: Total}}{Census_{Constraint \: Total}}
+  Weight_{New} = Weight_{Current} \times \frac{Census_{Constraint \: Total}}{Survey_{Constraint \: Total}}
 \label{eq:ipf-word}
 \end{equation}
 
@@ -290,13 +307,8 @@ $j$ of the aggregated results of the weighted
 microdata, $m$ (Table \ref{t:m}).
 $n$ represents the iteration number.
 
-After creating $Weight_{New}$, the individual level data is recreated before the next weight can be calculated using the next constraint.
-
-Do not worry about understanding the above equation for now.
-More important is implementing it. Follow the emboldened values in tables 1 to 4
-to see how the new weight of individual 3 is calculated for the age constraint.
-Table \ref{t:new-weights} illustrates the outcome. Notice that the
-sum of the weights is equal to the total population, from the constraint variables.
+Do not worry about understanding the above procedure for now.
+More important is implementing it. Using the example of under 50 as a template, calculate the new weight for individuals aged 50$+$. Table \ref{t:new-weights} illustrates the outcome to check your calculations. Notice that the sum of each weight ($W_2$, $W_3$, etc.) is always equal to the total population (12, in our example), which is a useful check.
 
 \begin{table}[htbp]
 \centering
@@ -308,10 +320,9 @@ Table \ref{t:s}.}
 {New weight, w(2)} \\ \midrule
 1 & Male & Over-50 & 1 & $1 \times 4/3 = \frac{4}{3}$ \\
 2 & Male & Over-50 & 1 & $1 \times 4/3 = \frac{4}{3}$ \\
-3 & Male & Under-50 & 1 & $\textbf{1} \times
-\textbf{8}/\textbf{2} = 4$ \\
+3 & Male & Under-50 & 1 & $1 \times \frac{\color{blue}8}{\color{blue}2} = 4$ \\
 4 & Female & Over-50 & 1 & $1 \times 4/3 = \frac{4}{3}$ \\
-5 & Female & Under-50 & 1 & $1 \times 8/2 = 4$ \\
+5 & Female & Under-50 & 1 & $1 \times \frac{\color{blue}8}{\color{blue}2} = 4$ \\
 \midrule
 Total & & & 5 & 12 \\
 \bottomrule
@@ -319,9 +330,10 @@ Total & & & 5 & 12 \\
 \label{t:new-weights}
 \end{table}
 
-The next stage is to re-aggregate the individual-level data,
-to compare the marginal totals with the constraint tables
-ready for the second constraint --- this will result in
+After creating $Weight_{New}$ for all possibilities of the first constraint (under 50 and 50$+$ for age), the individual level data is recreated (re-aggregated) before the next weight can be calculated using the next constraint.
+
+Re-aggregating the individual-level data --- to compare the marginal totals with the constraint tables
+ready for the second constraint --- will result in
 \cref{t:m2}. To generate this table, the new weights ($w(2)$,
 presented in \cref{t:new-weights}) are multiplied by the 
 number of individuals in each category. Thus, to calculate the new
@@ -420,10 +432,9 @@ Marginal totals&  & \multicolumn{2}{c}{$i$} & \\
 % R code we use to automate IPF will likely seem like a foreign language
 % to many. Spreadsheet programs like Microsoft Excel and LibrOffice Calc are
 % comparatively well known, though.
-To ensure smooth transition between the IPF process
-described in mathematics above and its implementation in R this section
-provides an intermediary stage: the speed of computation and the visual support
-of a graphical user interface (GUI).
+R is an unfamiliar programme to many, so before we move on to producing an R script that can calculate weights, we will carry out an intermediary step in a spreadsheet programme. For small examples like the one we are using, a spreadsheet has the two main advantages that: it is already familiar to many so can act as a bridge to calculating IPF using a computer; and it is easier to see and recall more than one table in a spreadsheet compared to R with R Studio.
+
+Open sms-spreadsheet-exercise.xlxs in your favourite spreadsheet programme (Microsoft Excel or LibreOffice/OpenOffice Calc) and follow the tasks outlined in the file. The steps are exactly the same as the pen and paper example above to allow you to more easily check your answers; to help with the transition of performing the calculations of IPF in a computer programme; and to aid recall of the procedure through repetition.
 
 
 \subsection{IPF in R: a simple example} \label{simplementing}
