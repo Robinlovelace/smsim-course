@@ -290,13 +290,13 @@ $j$ of the aggregated results of the weighted
 microdata, $m$ (Table \ref{t:m}).
 $n$ represents the iteration number.
 
-After creating $Weight_{New}$, the individual level data is recreated before the next weight can be calculated using the next constraint.
+After creating $Weight_{New}$, the individual level data is recreated before the next weight can be calculated using the next constraint. % To do this you...
 
-Do not worry about understanding the above equation for now.
+Do not worry about understanding the above procedure for now.
 More important is implementing it. Follow the emboldened values in tables 1 to 4
 to see how the new weight of individual 3 is calculated for the age constraint.
 Table \ref{t:new-weights} illustrates the outcome. Notice that the
-sum of the weights is equal to the total population, from the constraint variables.
+sum of each weight ($W_2$, $W_3$, etc.) is always equal to the total population, which is a useful check.
 
 \begin{table}[htbp]
 \centering
