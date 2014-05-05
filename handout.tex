@@ -74,9 +74,45 @@
 \newpage
 \section{Foundations}
 
+This practical teaches the basic theory and practice of `spatial microsimulation'
+using the popular free software package R. The term microsimulation means
+different things in different disciplines, so it is important to be clear
+at the outset what we will and will not be covering.
+
+\emph{We will} be learning how to create \emph{spatial microdata}, the
+basis of all spatial microsimulation models, using \emph{iterative
+proportional fitting}, an efficient method for allocating individuals from a
+non-spatial dataset to geographical zones. There are other ways of generating
+spatial microdata but, as far as the author is
+aware,\footnote{There is much need
+to compare different methods of generating spatial microdata, for example by
+building on the work of \citep{harland2012}. A project for doing
+these tests in a transparent way has been started at
+\href{https://github.com/Robinlovelace/IPF-performance-testing}{github.com/Robinlovelace/IPF-performance-testing}
+and there are probably many opportunities for improving the computational efficiency
+of the code presented in this course --- please get in touch if you would
+like to contribute.}
+this is the most effective and flexible for many applications.
+An alternative approach using the open source `Flexible Modelling Framework'
+program is described in detail, with worked examples, by \citet{harland2013microsimulation}.
+
+\emph{We will not} be learning `dynamic spatial microsimulation'
+\citep{Ballas2005b}: once the
+spatial microdata have been generated and \emph{integerised}, it is up to the
+user how they are used --- be it in an agent based model or as a basis for
+estimates of income distributions at the local level or whatever.
+
+We thus define spatial microsimulation narrowly in this tutorial as the process
+of generating \emph{spatial microdata} (more on this below). The term
+can also be used to describe a wider approach that harnesses individual-level data
+allocated to zones for investigating phenomena that vary over space and between individuals
+such as income inequality or energy overconsumption. In both cases, the generation
+of spatial microdata is the critical element of the modelling process so the skills
+learned in this tutorial will provide a firm foundation for further work.
+
 \subsection{Prerequisites for this practical}
 
-This practical is about spatial microsimulation in the software
+This practical uses the statical analysis and modelling software
 R. We suggest you install and take a look at this powerful program
 before getting started. We recommend using R within RStudio, which makes
 using R much easier. Instructions to install both R and RStudio can be found
@@ -84,7 +120,17 @@ online: \href{http://www.rstudio.com/ide/download/desktop}{rstudio.com/ide/downl
 
 The other prerequisite for the course is downloading the example data.
 These can be downloaded in a single zip file which can be found on the
-course's GitHub repository: \\*
+course's GitHub repository:\footnote{GitHub
+is used to serve this .zip file because if anything changes
+in the tutorial, the .zip file from the same location will
+automatically be updated. The other advantages of GitHub are its
+visibility --- a pdf of this tutorial, for example,
+is kept up-to-date at 
+\href{https://github.com/Robinlovelace/smsim-course/blob/master/handout.pdf}{github.com/Robinlovelace/smsim-course}
+in the `handout.pdf' file --- accessibility and encouragement of evolution: to contribute
+to this project all one needs to do is
+`\href{https://help.github.com/articles/fork-a-repo}{fork}' it.
+} \\*
 \href{https://github.com/Robinlovelace/smsim-course}{github.com/Robinlovelace/smsim-course}.
 Click on the ``Download ZIP'' button to the right of this page and extract
 the folder into your desktop or other suitable place on your computer.
@@ -505,7 +551,7 @@ The code snippets are taken from the `simple.R' script file (just a plain text
 document, like all R scripts) so you can copy and paste. However, it is
 highly recommended to not look at this file until you need to, towards
 the end of
-section. This is `leaning by typing'!
+section. This is leaning by typing, as advocated by \citet{shaw2013learn}.
 
 The data presented in the above worked example are saved in the
 `simple' sub-folder of `data' as .csv files. To load them in R,
@@ -672,7 +718,10 @@ ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons))
 
 With all of these objects in place, we are ready to begin allocating new weights
 to the individuals via IPF. Below is written in code the IPF formula presented
-in \cref{ipfeq}.
+in \cref{ipfeq}. It begins with a couple of \emph{for loops}, one to iterate through
+each zone (hence the \texttt{1:nrow(cons)} argument, which means ``from
+1 to the number of zones in the constraint data'') and one to iterate
+through each category within constraint 1 (under 50 and over 50 in this case):
 
 \begin{lstlisting}[float=h, caption={Creating new weights for the individuals
 based on constraint 1 (age) via IPF}]
@@ -681,7 +730,8 @@ for (j in 1:nrow(cons)){
  weights[which(ind.cat[,i] == 1),j] <- con1[j,i] / ind.agg[j,i]}}
 \end{lstlisting}
 
-The above code creates the weight matrix that allocates individuals to zones.
+The above code creates the weight matrix that allocates individuals to zones
+and is explained in more detail in \cref{sipfcake}.
 Aggregating this data to zones allows us to update `ind.agg' with new values
 that will be closer to the constraint variables. This is verified in the `simple.R'
 script file with a line of code that calculates the Total Absolute Error
@@ -733,7 +783,7 @@ the technique more memorable. An attempt has been made to present the method
 in a generalisable was as possible, allowing users to apply the technique described
 here to their own data.
 
-The code needed to run the main part of the example is contained within `cakeMap.R'.
+The code needed to run the main part of the example is contained within `cMap.R'.
 Note that this script makes frequent reference to files contained in the `cakeMap'
 folder `data'. \verb read.csv("data/cakeMap/ind.csv") , for example, is used to read
 the individual level data into R.
@@ -804,10 +854,91 @@ the datasets (a pen and paper can help here, as well as R!) is it time
 to move on to generate the spatial microdata using IPF.
 
 \subsection{Performing IPF on the CakeMap data}
+\label{sipfcake}
+The R script used to perform IPF on the CakeMap data is almost identical to
+that used to perform the process on the simple example in the previous section.
+The main difference is that there are more constraints (3 not 2) but otherwise
+the code is very similar.  Confirm this for yourself: it will be instructive
+to compare the `simple.R' and
+`\href{https://github.com/Robinlovelace/smsim-course/blob/master/cMap.R}{cMap.R}'
+script files. Note that
+the former works on a tiny example of 5 input individuals whereas the latter
+calculates weights for 916 individuals. The code is generalisable, meaning
+that the IPF process would still work given slightly different inputs.
+The script would still work if more individuals or zones were added although
+some code may need to be adjusted. For example, to ensure the process works with different
+constraints, including the file `categorise.R'.
 
-\subsection{Processing the output}
+Note the length of `cMap.R' is exactly 100 lines. The additional length is due
+to the third constraint, additional iterations (see line 66 onwards) and some
+preliminary analysis. The best way to understand what is happening in this
+script is simply to read through it and run chunks of it in R (remember the 
+\verb Ctl-Enter ~ command) to see what happens. Try to `think like a computer'
+and imagine what each line of code is doing. This is inevitably difficult
+at first so it is recommended that users add more comments to lines
+that cause confusion to help remember what is going on. To help this process,
+the meaning of some of the trickier and more important lines is explained below.
+One potentially confusing area is the representation of the \texttt{weights} object,
+used to store the weights after each constraint. To understand what is happening
+try entering this code into R and seeing what happens:
 
-\subsection{Mapping the results}
+\begin{lstlisting}[float=h, caption={Creating the initial weight matrix --- see lines
+28 to 30 in cMap.R}]
+# create weights in 3D matrix (individuals, areas, iteration)
+weights <- array(dim=c(nrow(ind),nrow(cons),num.cons+1))
+weights[,,num.cons+1][] <- 1 # sets initial weights to 1
+ini.ws <- weights[,,num.cons+1]
+\end{lstlisting}
+
+In the above code, \texttt{weights} is created by the \texttt{array}
+command, which in fact creates many 2 dimensional matrices in a
+`data cube'. If this is confusing, just remember that
+the `square' weight matrix --- where each column represents a zone
+and each row represents an individual --- can be returned to by
+specifying the third dimension. Because dimensions in R are specified by
+the square brackets, the initial weights can be called by typing
+\texttt{weights[,,4]}. This should result in hundreds of 1s, the initial weights.
+To print a more manageable-sized output, remember how to subset the other
+dimensions: \texttt{weights[1:3,1:5,4]}, for example, will print the first
+3 rows (individuals) and first 5 columns of the 4th matrix. Why do we do it like this?
+So that we only need one weights object to remember all the previous weights
+so we can go back and check whether the model fit is improving from one constraint
+and one iteration to the next.
+
+Now, when the new weights are set after iteration 1, they are saved as follows,
+within a nested \emph{for loop} that iterates over all zones (j) and
+constraint categories (i):
+
+\begin{lstlisting}[float=h, caption={Saving the new weights after the first
+constraint of IPF --- see line 43 in cMap.R}]
+weights[which(ind.cat[,i] == 1),j,1] <- con1[j,i] /ind.agg[j,i,1]}}
+\end{lstlisting}
+
+Note that the square brackets are used to great effect in the above line of code.
+Let's break down each element of the code within these square `subsetting' brackets:
+\begin{itemize}
+ \item \texttt{which(ind.cat[,i] == 1)} is a subset of the rows in the weight matrix
+ which correspond to all individuals who belong to category i. (Remember,
+ \texttt{ind.cat} is the `wide' version of the individual level data, containing
+ 1s for all categories to which each individual belongs.)
+ \item \texttt{,j,1]} specify the column and constraint respectively.
+ Because we are in a for loop, j simply runs through all categories within the
+ current constraint (age/sex). The 1 is selected because this is the first set of
+ re-weighting (this is analogous to say $w(2)$ --- the first new weight ---
+ in the IPF equations in the previous section).
+ \item Finally, \texttt{con1[j,i] /ind.agg[j,i,1]} is R's implementation of
+ \cref{eq:ipf}: we divide the desired census values by the current simulated
+ totals for each category based on the individual's current weight.
+\end{itemize}
+
+The above explanation should help understand what is going on in other
+parts of the script file also --- for example try printing subsets of
+the \texttt{weights} object after running constraint 1, 2 and then 3 to
+see how the weights change.
+
+% \subsection{Processing the output}
+
+% \subsection{Mapping the results}
 \section{Applying the technique in the real world} \label{smeval}
 Here we will continue with the cakeMap model we ran in the previous section.
 
@@ -841,7 +972,7 @@ a map of the results, to see how it varies from place to place.
 The code used to do this found in `cMapPlot.R'. A vital function within
 this script is `merge', which is used to add the simulated cake data
 to the geographic 
-dataframe:\footnote{`join'
+data frame:\footnote{`join'
 is an alternative to merge from the `plyr' package also used
 in the `cMapPlot.R' script that performs the
 same task. Assuming `plyr' is loaded --- `library(plyr)' you can read
@@ -949,7 +1080,7 @@ constructed and the same applies to geographical research.
 The focus on strong foundations is also sensible because the
 number of people actively involved in spatial microsimulation research,
 let alone development of new software and methods, is very small.
-Specialist skills and understanding is needed to join this research area
+Specialist skills and understanding are needed to join this research area
 and a central outcome of this course has been to provide these.
 More specifically, we have learned how to:
 \begin{itemize}
@@ -1047,8 +1178,8 @@ If the fit improves after any particular change, the change is kept.
 \citet{Williamson2007} provides a practical user manual for implementing the technique in code.
 \item \textbf{Data frame}: a type of object (formally referred to as a class)
 in R, data frames are square tables composed of rows and columns of
-information. As with many things in R, the best way to understand dataframes is
-to create them and experiment. The following creates a dataframe with two
+information. As with many things in R, the best way to understand data frames is
+to create them and experiment. The following creates a data frame with two
 variables: name and height:
 \begin{verbatim}
  data.frame(name = c("Robin", "Phil"), height.cm = c(172, 174))
@@ -1061,6 +1192,10 @@ microdata that allocates fractional weights to individuals based on how represen
 they are of the target area. It differs from combinatorial optimisation approaches in
 that it requires no random numbers. The most frequently used method of deterministic
 reweighting is IPF.
+\item \textbf{For loops} are instructions that tell the computer to run a certain
+set of command repeatedly. \emph{i in for(1:9) {print i}}, for example will print
+the value of i 9 times. The best way to further understand for loops is to try them
+out.
 \item \textbf{Iteration}: one instance of a process that is repeated many times until
 a predefined end point, often within an \emph{algorithm}.
  \item \textbf{Iterative proportional fitting} (IPF): an iterative process implemented in
