@@ -288,7 +288,7 @@ Area $\Downarrow$  & Under-50 & Over-50 &  Male & Female\\
 \end{table}
 
 Now, it will be recognised by the astute reader that the data in
-Tables \ref{t:m} and \ref{t:s} are incompatible: they are
+Tables \ref{t:m} and \ref{t:s} are incompatible; they are
 two matrices with different dimensions ($3 \times 3$ and $1 \times 4$ respectively).
 To solve this problem we can rearrange the small area census constraints data
 ($s$, presented in Table \ref{t:s}) to match the dimensions of
@@ -338,40 +338,41 @@ individuals so that:
   \item Their sum equals the total population of the geography of interest (12 in our example).
 \end{itemize}
 
-For each constraint the current weight is multiplied by the respective
+For each constraint the current weight (Table~\ref{t:m}) is multiplied by the respective
 total from the geographically aggregated (census) table (Table~\ref{t:s}) and
 divided by the corresponding marginal total of the survey data (see \cref{t:m}).
 For example, using the age constraint the new weight of individual 3 is calculated
 based on the following numbers: the initial weight is set as 1, the number of
 individuals under 50 in the geographically aggregated (Census) data is 8 (see Table \ref{t:s})
 and the number
-of individuals under 50 in the survey data is 2. Thus the new weight is
+of individuals under 50 in the survey data is 2 (see Table~\ref{t:m}). Thus the new weight is
 $1 \times \frac{8}{2}$. These figures
 are highlighted in \textbf{\color{blue}bold and blue} in the preceding tables.
 The same process is used to calculate the new weights for all individuals --- remember
-we are only constraining by age for now. Test your understanding by calculating
-the value of the ? symbols in the table below.
-
+we are only constraining by age for now.
+% Test your understanding by calculating
+% the value of the ? symbols in table~\ref{t:new-weights-part-complete} below.
+% 
 % \begin{table}[htbp]
 % \centering
 % \caption{Partially complete reweighted microdata.}
 % \begin{tabular}{lllll}
 % \toprule
 % {Individual} & {Sex} & {age-group} & {Weight} &
-% {New weight, $w_{2}$} \\ \midrule
+% {New weight, $w(2)$} \\ \midrule
 % 1 & Male & Over-50 & 1 & ? \\
 % 2 & Male & Over-50 & 1 & ? \\
 % 3 & Male & Under-50 & 1 & $1 \times \frac{\color{blue}8}{\color{blue}2} = 4$ \\
 % 4 & Female & Over-50 & 1 & ? \\
-% 5 & Female & Under-50 & 1 & $1 \times \frac{\color{blue}8}{\color{blue}2} = 4$ \\
+% 5 & Female & Under-50 & 1 & ? \\
 % \bottomrule
 % \end{tabular}
-% \label{t:new-weights}
+% \label{t:new-weights-part-complete}
 % \end{table}
-
-This process of \emph{reweighting} is done one constraint at a time. And can
+% 
+This process of \emph{reweighting} is done one constraint at a time and can
 be described more succinctly in the form of a word equation
-\cref{eq:ipf-word} and more generally by \cref{eq:ipf} for constraint $i$ (age):
+\cref{eq:ipf-word}, and more generally by \cref{eq:ipf} for constraint $i$ (age):
 
 \begin{equation}
   Weight_{New} = Weight_{Current} \times \frac{Census_{Constraint \: Total}}{Survey_{Constraint \: Total}}
@@ -532,8 +533,7 @@ R is an unfamiliar programme to many, so before we move on to producing an R scr
 example was produced by Phil Mike Jones --- see \href{http://www.philmikejones.net/}{philmikejones.net}.}
 For small examples like the one we are using, a spreadsheet has the two main advantages that: it is already familiar to many so can act as a bridge to calculating IPF using a computer; and it is easier to see and recall more than one table in a spreadsheet compared to R with R Studio.
 
-Open sms-spreadsheet-exercise.xlxs in your favourite spreadsheet programme (Microsoft Excel or LibreOffice/OpenOffice Calc) and follow the tasks outlined in the file. The steps are exactly the same as the pen and paper example above to allow you to more easily check your answers; to help with the transition of performing the calculations of IPF in a computer programme; and to aid recall of the procedure through repetition.
-
+Open sms-spreadsheet-exercise.xlxs if you are using Microsoft Excel or sms-spreadsheet-exercise.odt (note the different file types) if you are using LibreOffice/OpenOffice Calc and follow the tasks outlined in the file. The steps are exactly the same as the pen and paper example above to allow you to more easily check your answers; to help with the transition of performing the calculations of IPF in a computer programme; and to aid recall of the procedure through repetition.
 
 \subsection{IPF in R: a simple example} \label{simplementing}
 % priority: automate!!!
@@ -550,8 +550,8 @@ documents. See \href{http://rpubs.com/RobinLovelace/5089}{rpubs.com/RobinLovelac
 The code snippets are taken from the `simple.R' script file (just a plain text
 document, like all R scripts) so you can copy and paste. However, it is
 highly recommended to not look at this file until you need to, towards
-the end of
-section. This is leaning by typing, as advocated by \citet{shaw2013learn}.
+the end of this
+section. This is learning by typing, as advocated by \citet{shaw2013learn}.
 
 The data presented in the above worked example are saved in the
 `simple' sub-folder of `data' as .csv files. To load them in R,
@@ -564,14 +564,13 @@ cons <- read.csv("data/simple/cons.csv") # load aggregate constraints
 
 To check that the \emph{data frames} have loaded correctly, simply
 ask R to print their contents by entering the object's name. To display the
-individual level data, for example, simply type the
-following:\footnote{An alternative
+individual level data, for example, simply type \verb/ind/:\footnote{An alternative
 solution is to click the object's name in `Environment' in
 RStudio's top right window.}
 
 \begin{lstlisting}[float=h, caption={Checking the contents of the individual
 level data frame}, label=cout]
-ind # Show the data frame in R
+ind  # Show the data frame in R
 ##  id age sex
 ##   1  59   m
 ##   2  54   m
@@ -583,17 +582,17 @@ ind # Show the data frame in R
 Note that the input data is identical to the tables illustrated above for
 consistency. Instead of constraining for just one zone as we did in the example
 above, we will fit the data to six zones here. To subset a dataset, add square
-brackets to the end of the object's name in R. Entering \verb cons[1:2,] ,
+brackets to the end of the object's name in R. Entering \verb cons[1:2, ] ,
 for example, should output the first two rows of the constraint variable.
-Within the square brackets the number before the comma refers to columns (blank
-means all columns) and the numbers after the comma refer to rows. If the output
+Within the square brackets the number before the comma refers to rows (blank
+means all rows) and the numbers after the comma refer to columns. If the output
 of this command looks like the text below, congratulations are in order:
-you have successfully loaded the constraint dataset.
+you have successfully loaded a subset of the constraint dataset.
 
 \begin{lstlisting}[float=h, caption={Printing a subset of the constraint data
 in R},
 label=cou]
-cons[1:2,]
+cons[1:2, ]
 ##    X16.49 X50. m f
 ##  1      8    4 6 6
 ##  2      2    8 4 6
@@ -700,21 +699,23 @@ The sum of both age and sex variables is 5 (the total number of individuals): it
 worked! Now the data is in the same form as the constraint variables and we
 have checked the data makes sense, we can create the `weight' matrix and begin
 reweighting the individuals to
-zones:\footnote{The
-above code will probably seem
-daunting and not make sense unless
-you are an experienced R user. Do not worry about this for now, you can always
-check what is going on later by checking R's documentation (e.g. try entering
-`?rep') or
-by pressing the tab key when entering arguments for R commands. For the time
-being, it is best to press-on with the example and understand the concepts ---
-the details can be looked at later.}
+zones:
 
 \begin{lstlisting}[float=h, caption={Creating the weight and aggregated
 individual level matrices}]
 weights <- array(1, dim=c(nrow(ind),nrow(cons)))
 ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons))
 \end{lstlisting}
+
+The
+above code will probably seem
+daunting and not make sense unless
+you are an experienced R user. Do not worry about this for now, you can always
+check what is going on later by checking R's documentation (e.g. try entering
+\verb ?rep ) or
+by pressing the tab key when entering arguments for R commands. For the time
+being, it is best to press-on with the example and understand the concepts ---
+the details can be looked at later.
 
 With all of these objects in place, we are ready to begin allocating new weights
 to the individuals via IPF. Below is written in code the IPF formula presented
