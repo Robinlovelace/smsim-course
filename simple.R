@@ -17,11 +17,11 @@ ind.cat # take a look at the output
 
 colSums(ind.cat)
 
+# create weight object and aggregated individual-level data
 weights <- array(1, dim=c(nrow(ind),nrow(cons))) 
+ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons) )
 
-# convert survey data into aggregates to compare with census (3D matix)
-ind.agg <- matrix(rep(colSums(ind.cat), times = nrow(cons)), nrow = nrow(cons) )
-## the total absolute error 
+## total absolute error 
 sum(abs(ind.agg - cons)) # the total absolute error 
 sum(abs(ind.agg[1,] - cons[1,])) ## total absolute error for zone 1
 

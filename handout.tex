@@ -113,7 +113,7 @@ learned in this tutorial will provide a firm foundation for further work.
 
 One of the tricky things about spatial microsimulation for newcomers is its use
 of specialist language. It is important to know exactly what is meant by
-`special microdata' and other technical terms. To this end we have created a
+`spatial microdata' and other technical terms. To this end we have created a
 glossary that provide succinct definitions (see \cref{gloss}). Any term that is
 \emph{italicised} in the text has a glossary entry.
 
@@ -204,9 +204,10 @@ example data.
 
 \subsection{Input data} \label{s:theory}
 
-Let's start with a very basic dataset. To aid understanding, we will primarily do
+Let's start with two very basic datasets. To aid understanding, we will primarily do
 the reweighting by hand to understand the process before automating it on the computer.
-As outlined in Figure~\ref{fmsim-schema}, there are two input files required to perform spatial microsimulation:
+As outlined in Figure~\ref{fmsim-schema},
+there are two input files required to perform spatial microsimulation:
 \begin{itemize}
   \item Survey data - information about individuals
   \item Geographically aggregated (`wide') data - typically aggregated Census tables
@@ -397,7 +398,7 @@ meaning will probably take time to sink in.
 More important is implementing it.
 
 Follow the blue emboldened values in tables 1 to 4 to fill in the
-question marks in the table below and calculate the new weight
+question marks in \cref{t:new-weights} and calculate the new weight
 of individual 3, a male under 50 years of age.
 To validate your calculation, the sum of weights ($W_1$ to $W_5$)
 should equal the population of the zone (12, in our example). This is a
@@ -729,22 +730,18 @@ colSums(ind.cat)
 The sum of both age and sex variables is 5 (the total number of individuals): it
 worked! Now the data is in the same form as the constraint variables and we
 have checked the data makes sense, we can create the `weight' matrix and begin
-reweighting the individuals to
-zones:
+reweighting the individuals to zones (\cref{lscreate}).
 
 \begin{lstlisting}[float=h, caption={Creating the weight and aggregated
-individual level matrices}]
-weights <- array(1, dim=c(nrow(ind),nrow(cons)))
-ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons))
+individual level matrices --- see lines 21 and 22 in `simple.R'}, label=lscreate]
+weights <- array(1, dim=c(nrow(ind),nrow(cons))) 
+ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons) )
 \end{lstlisting}
 
-The
-above code will probably seem
-daunting and not make sense unless
-you are an experienced R user. Do not worry about this for now, you can always
+The code in \cref{lscreate} may not make total sense. Do not worry about this for now, you can always
 check what is going on later by checking R's documentation (e.g. try entering
 \verb ?rep ) or
-by pressing the tab key when entering arguments for R commands. For the time
+by pressing the tab key when entering arguments for R commands in RStudio. For the time
 being, it is best to press-on with the example and understand the concepts ---
 the details can be looked at later.
 
@@ -755,10 +752,12 @@ to the individuals via IPF. Below is written in code the IPF formula presented
 in \cref{ipfeq}. It begins with a couple of \emph{for loops}, one to iterate through
 each zone (hence the \texttt{1:nrow(cons)} argument, which means ``from
 1 to the number of zones in the constraint data'') and one to iterate
-through each category within constraint 1 (under 50 and over 50 in this case):
+through each category within constraint 1 (under 50 and over 50 in this case).
+Before running this code, ensure that all previous commands in the `simple.R'
+script have been performed.
 
 \begin{lstlisting}[float=h, caption={Calculating new weights for the individuals
-based on constraint 1 (age) via IPF}]
+based on constraint 1 (age) via IPF --- see line 30 and beyond in `simple.R'}]
 for (j in 1:nrow(cons)){
   for(i in 1:ncol(con1)){
  weights[which(ind.cat[,i] == 1),j] <- con1[j,i] / ind.agg[j,i]}}
@@ -798,8 +797,9 @@ age are now equal to the aggregate values for age of zone 1.
 This is further
 verified in the `simple.R'
 script file with a line of code that calculates the Total Absolute Error
-after each iteration --- \verb sum(sqrt((ind.agg-cons)^2)) .
-Check the error decreases with each iteration.
+after each iteration --- \verb sum(abs(ind.agg - cons)) .
+Check that the error decreases with each iteration (see \cref{svalid} for
+more on model checking and validation).
 
 % At this stage you should switch to running the code in `simple.R'. In RStudio
 % to run a line of code from the top left window, simply press \verb Ctl-Enter .
@@ -1028,6 +1028,7 @@ and these are allocated to the areas. From this point onwards, the modelling and
 analysis applications should be comparatively straightforward.
 
 \subsection{Model checking and validation}
+\label{svalid}
 To make an analogy with food safety standards, openness about mistakes is
 conducive to high standards \citep{Powell2011}. Transparency in model
 verification is desirable for similar reasons. The two main strategies are 1) 
@@ -1106,7 +1107,6 @@ cake consumption in West Yorkshire, based on simulated data.}
 \end{figure}
 
 \subsection{Analysis} \label{sanalysis}
-
 Once a spatial microdataset has been generated that we are happy with,
 we will probably want to analyse it further. This means exploring it --- its main features,
 variability and links with other datasets. To illustrate this process we will
