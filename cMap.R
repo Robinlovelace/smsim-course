@@ -14,7 +14,7 @@ con1 <- cons[1:12]
 con2 <- cons[13:14]
 con3 <- cons[15:24]
 
-num.cons <- 3  # calculate n. constraints (can set manually)
+num.cons <- 3  # n. constraints - can set automatically: length(which(grepl("con[1-9]",ls()))))
 category.labels <- names(cons) # should be correct from cons.R
 
 # set-up aggregate values - column for each category
@@ -77,7 +77,7 @@ source(file="data/cakeMap/e2.R")
 wf[,,,it,1] <- weights
 indf[,,,it,1] <- ind.agg
 }
-fw <- weights[,,4] * weights[,,1] * weights[,,2] *  weights[,,3] 
+fw <- weights[,,4] * weights[,,1] * weights[,,2] *  weights[,,3] # save final weights
 
 ############## The analysis part #############
 a.v <- as.vector(as.matrix(cons)) # constraints in long form, for cor

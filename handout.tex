@@ -20,7 +20,7 @@
 \usepackage[nottoc,numbib]{tocbibind}
 
 \hypersetup{urlcolor=blue, colorlinks=false, hypertexnames=true}  % Colours hyperlinks in blue, but this can be distracting 
-\usepackage{cleveref}
+\usepackage[capitalise]{cleveref}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -81,7 +81,8 @@ at the outset what we will and will not be covering.
 
 \emph{We will} be learning how to create \emph{spatial microdata}, the
 basis of all spatial microsimulation models, using \emph{iterative
-proportional fitting}, an efficient method for allocating individuals from a
+proportional fitting} (IPF). IPF is
+an efficient method for allocating individuals from a
 non-spatial dataset to geographical zones. There are other ways of generating
 spatial microdata but, as far as the author is
 aware,\footnote{There is much need
@@ -110,13 +111,29 @@ such as income inequality or energy overconsumption. In both cases, the generati
 of spatial microdata is the critical element of the modelling process so the skills
 learned in this tutorial will provide a firm foundation for further work.
 
+One of the tricky things about spatial microsimulation for newcomers is its use
+of specialist language. It is important to know exactly what is meant by
+`special microdata' and other technical terms. To this end we have created a
+glossary that provide succinct definitions (see \cref{gloss}). Any term that is
+\emph{italicised} in the text has a glossary entry.
+
+\begin{wrapfigure}{2}{11cm}
+\begin{center}
+   \includegraphics[width=10.5cm]{rstudio}
+\end{center}
+ \caption{The RStudio user interface. Note the project title `smsim-course' in
+the top right and the `Files' tab at the top of the left hand window.}
+\label{frstudio}
+\end{wrapfigure}
+
 \subsection{Prerequisites for this practical}
 
 This practical uses the statical analysis and modelling software
 R. We suggest you install and take a look at this powerful program
-before getting started. We recommend using R within RStudio, which makes
+before getting started. We recommend using R within RStudio \cref{frstudio}, which makes
 using R much easier. Instructions to install both R and RStudio can be found
-online: \href{http://www.rstudio.com/ide/download/desktop}{rstudio.com/ide/download/desktop}.
+at \href{http://www.rstudio.com/ide/download/desktop}{rstudio.com}.
+% Could add screenshot of Dl ZIP here!!!
 
 The other prerequisite for the course is downloading the example data.
 These can be downloaded in a single zip file which can be found on the
@@ -130,20 +147,10 @@ is kept up-to-date at
 in the `handout.pdf' file --- accessibility and encouragement of evolution: to contribute
 to this project all one needs to do is
 `\href{https://help.github.com/articles/fork-a-repo}{fork}' it.
-} \\*
+} \\
 \href{https://github.com/Robinlovelace/smsim-course}{github.com/Robinlovelace/smsim-course}.
 Click on the ``Download ZIP'' button to the right of this page and extract
 the folder into your desktop or other suitable place on your computer.
-% Could add screenshot of Dl ZIP here!!!
-
-\begin{wrapfigure}{2}{11cm}
-\begin{center}
-   \includegraphics[width=10.5cm]{rstudio}
-\end{center}
- \caption{The RStudio user interface. Note the project title `smsim-course' in
-the top right and the `Files' tab at the top of the left hand window.}
-\label{frstudio}
-\end{wrapfigure}
 
 Once the folder has been successfully extracted open it in
 your browser and take a look around. You will find a number of files
@@ -159,8 +166,17 @@ Before using the power of R in RStudio it's worth
 understanding a bit about `IPF', the algorithm we will use to generate
 the synthetic population or `spatial microdata' (\cref{fmsim-schema}).
 
-\subsection{Learning by doing}
+\begin{figure}[H]
+\begin{center}
+\includegraphics[width=7cm]{msim-schema}
+\end{center}
+\caption{Schema of iterative proportional fitting (IPF) and combinatorial
+optimisation
+in the wider context of the availability of different data formats and spatial
+microsimulation. \label{fmsim-schema}}
+\end{figure}
 
+\subsection{Learning by doing}
 As \citet[xxii]{kabacoff2011r} put it regarding R, ``the best
 way to learn is to experiment'' and the same applies to spatial microsimulation.
 We believe you will learn the technique/art best not by reading about it, 
@@ -170,12 +186,6 @@ that many people learn best. Think of someone learning to skate: no one ever
 picks up a skateboard for the first time being able to `surf the sidewalks'. It
 takes time, patience and plenty of falls before you master the art.
 The same applies to spatial microsimulation.
-
-One of the tricky things about spatial microsimulation for newcomers is its use
-of specialist language. It is important to know exactly what is meant by
-`special microdata' and other technical terms. To this end we have created a
-glossary that provide succinct definitions (see \cref{gloss}). Any term that is
-\emph{italicised} in the text has a glossary entry.
 
 Spatial microsimulation works by taking \emph{microdata} at the individual level
 and using aggregate-level constraints to allocate these individuals to zones.
@@ -191,17 +201,6 @@ Take a look at the image and think about the process. But we don't want to get
 bogged down in theory or applications in this course: we want to `get our
 hands dirty'. Next we will do just that, by applying the process to some
 example data.
-
-\begin{figure}[H]
-\begin{center}
-  \includegraphics[width=9cm]{msim-schema}
-\end{center}
-\caption{Schema of iterative proportional fitting (IPF) and combinatorial
-optimisation
-in the wider context of the availability of different data formats and spatial
-microsimulation. \label{fmsim-schema}}
-\end{figure}
-
 
 \subsection{Input data} \label{s:theory}
 
@@ -222,9 +221,9 @@ blue and bold for future reference.
 \begin{table}[h]
 % {r}{10cm}
 \caption{Hypothetical input microdata (`survey data')
-% (the original
-% weights set to one). The bold value is used subsequently for
-% illustrative purposes.
+(the original
+weights set to one). The bold and blue value is used subsequently for
+illustrative purposes.
 }
 \label{t:w}
 \begin{center}
@@ -260,7 +259,7 @@ Note, these values are updated by each new set of weights.
 
 \begin{tabular}{cllll}\toprule
 Marginal totals&  & \multicolumn{2}{c}{$j$} & \\
-& Age/sex & Male & Female & T\\ \midrule
+& Age/sex & Male & Female & T \\ \midrule
 \multirow{2}{*}{$i$} & Under-50 & \textbf{\color{blue}1} & 1 & \textbf{\color{blue}2}\\
 & Over-50 & 2 & 1 &3 \\
 & T & 3 & 2 &5\\
@@ -424,7 +423,7 @@ Total & & & 5 & 12 \\
 \label{t:new-weights}
 \end{table}
 
-\subsection{Re-aggregation after the first constraint}
+\subsection{Re-aggregation after the first constraint} \label{sreag}
 After creating $Weight_{New}$ for all possibilities of the first constraint (under 50 and 50$+$ for age),
 the individual level data is re-aggregated before the next weight can be calculated using the next constraint.
 
@@ -535,15 +534,40 @@ For small examples like the one we are using, a spreadsheet has the two main adv
 
 Open sms-spreadsheet-exercise.xlxs if you are using Microsoft Excel or sms-spreadsheet-exercise.odt (note the different file types) if you are using LibreOffice/OpenOffice Calc and follow the tasks outlined in the file. The steps are exactly the same as the pen and paper example above to allow you to more easily check your answers; to help with the transition of performing the calculations of IPF in a computer programme; and to aid recall of the procedure through repetition.
 
-\subsection{IPF in R: a simple example} \label{simplementing}
+\section{IPF in R} \label{simplementing}
 % priority: automate!!!
 So far we have implemented IPF by hand and in a spreadsheet.
 This section explains how the IPF
 \emph{algorithm} described above is implemented in R, using the
-same input data.\footnote{A fuller tutorial is available from Rpubs, a site dedicated
-to publishing R analyses that are reproducible. This tutorial uses the RMarkdown
-mark-up language, which enables R code to be run and presented within
-documents. See \href{http://rpubs.com/RobinLovelace/5089}{rpubs.com/RobinLovelace/5089}\label{fnrpub}.}
+same input data. Now we will be working within the RStudio
+environment with the `smsim-course' project 
+loaded with the `simple.R' file loaded in the top left script tab
+(\cref{frsimple}). 
+
+\begin{figure}
+\begin{center}
+\includegraphics[width=15cm]{rs-simple}
+\end{center}
+\caption{The RStudio user interface with the `simple.R' file loaded in
+the top left window and some output displayed in the bottom left window.}
+\label{frsimple}
+\end{figure}
+
+Note a couple of things from this figure:
+there are many explanations of the code and these are commented out
+by the \texttt{\#} ('hash') symbol. Also not in the bottom left panel
+R displays the output of the commands we send it from the script.
+Hitting the \texttt{Ctrl} and \texttt{Enter} keys simultaneously from
+within the upper (script) window will cause R to run these commands,
+line by line. In the code blocks below, any outputs from R are preceded
+by `\texttt{\#\#}'. Comparing these outputs with the output on your screen will
+ensure that R is behaving as it should.
+
+We will spend the rest of this section working through
+the commands contained in this file.\footnote{A longer
+tutorial is available from Rpubs, a site dedicated
+to publishing R analyses that are reproducible:
+\href{http://rpubs.com/RobinLovelace/5089}{rpubs.com/RobinLovelace/5089}.}
 % This section is based on ``Spatial microsimulation in R: a
 % beginner’s guide to iterative proportional fitting (IPF)'', a tutorial
 % written to accompany a methods paper on integerisation
@@ -552,6 +576,8 @@ document, like all R scripts) so you can copy and paste. However, it is
 highly recommended to not look at this file until you need to, towards
 the end of this
 section. This is learning by typing, as advocated by \citet{shaw2013learn}.
+
+\subsection{Loading and exploring the input data}
 
 The data presented in the above worked example are saved in the
 `simple' sub-folder of `data' as .csv files. To load them in R,
@@ -678,15 +704,20 @@ the results of doing IPF on the computer with the results obtained by hand.
 % ## [1] TRUE TRUE TRUE TRUE TRUE
 % \end{lstlisting}
 
-To make the individual level data comparable to the aggregate level we must
+To make the individual level dataset comparable to the aggregate level we must
 first categorise it and count the number in each category. This job is
 performed by the R \emph{script} categorise.R, contained in the `simple' data
 folder. Run it by entering
-\verb source("data/simple/categorise.R")) . This results in the creation of a
-new object called ind.cat, which converts the variables into a matrix of 0s and
-1s with same number of columns as the constraint data. Note that the
+\verb source("data/simple/categorise.R")) .\footnote{Note
+that the
 `categories.R' script must be modified each time it is used with a different
-dataset. To check that the script has worked
+dataset.}
+This results in the creation of a
+new object called \texttt{ind.cat} in R, which is a matrix of 0s and
+1s with same number of columns as the constraint data --- try
+exploring \texttt{ind.cat} using the square bracket notation mentioned above.
+
+To check that the script has worked
 properly, lets count the number of individuals it contains:
 
 \begin{lstlisting}[float=h, caption={Output from ind.cat}]
@@ -717,6 +748,8 @@ by pressing the tab key when entering arguments for R commands. For the time
 being, it is best to press-on with the example and understand the concepts ---
 the details can be looked at later.
 
+\subsection{Reweighting by the age constraint}
+
 With all of these objects in place, we are ready to begin allocating new weights
 to the individuals via IPF. Below is written in code the IPF formula presented
 in \cref{ipfeq}. It begins with a couple of \emph{for loops}, one to iterate through
@@ -724,29 +757,63 @@ each zone (hence the \texttt{1:nrow(cons)} argument, which means ``from
 1 to the number of zones in the constraint data'') and one to iterate
 through each category within constraint 1 (under 50 and over 50 in this case):
 
-\begin{lstlisting}[float=h, caption={Creating new weights for the individuals
+\begin{lstlisting}[float=h, caption={Calculating new weights for the individuals
 based on constraint 1 (age) via IPF}]
 for (j in 1:nrow(cons)){
   for(i in 1:ncol(con1)){
  weights[which(ind.cat[,i] == 1),j] <- con1[j,i] / ind.agg[j,i]}}
 \end{lstlisting}
 
-The above code creates the weight matrix that allocates individuals to zones
-and is explained in more detail in \cref{sipfcake}.
-Aggregating this data to zones allows us to update `ind.agg' with new values
-that will be closer to the constraint variables. This is verified in the `simple.R'
+The above code updates the weight matrix by dividing
+the census constraint (\texttt{con1}) by the aggregated version
+of the individual level data, just as in \cref{ipfeq} above.
+Further explanation is provided in \cref{sipfcake}: for now let's push on
+to the next block of code, which updates the aggregated data (named
+\texttt{ind.agg} in R) based on the the new weights.
+
+\subsection{Re-aggregation}
+
+\begin{lstlisting}[float=h, caption={Re-aggregation of the individual
+level data based on the new weights (see lines 35 and 36 in `simple.R')}]
+for (i in 1:nrow(cons)){ # convert con1 weights back into aggregates
+  ind.agg[i,]   <- colSums(ind.cat * weights[,i])}
+\end{lstlisting}
+
+The above line of code multiply the new weights by the
+flat version of the individual-level data, one zone (i) at a
+time. This is equivalent to the re-aggregation stage described in
+\cref{sreag} and the result can be checked by printing the first
+row of our new \texttt{ind.agg} object:
+
+\begin{lstlisting}[float=h, caption={The new aggregate (marginal) totals for each category
+after weights have been constrained by age. Compare with \cref{t:m2} above.}]
+ind.agg[1, ]
+##    [1] 8.000000 4.000000 6.666667 5.333333
+\end{lstlisting}
+
+To recap, we have updated `ind.agg' with new values
+that are constrained by the age variable. This seems to improve the fit
+between the census and individual-level data as the marginal totals for
+age are now equal to the aggregate values for age of zone 1.
+This is further
+verified in the `simple.R'
 script file with a line of code that calculates the Total Absolute Error
 after each iteration --- \verb sum(sqrt((ind.agg-cons)^2)) .
 Check the error decreases with each iteration.
 
-At this stage you should switch to running the code in `simple.R'. In RStudio
-to run a line of code from the top left window, simply press \verb Ctl-Enter .
-Use this technique to constrain by the second constraint, sex.
-Notice that we have just done in code what was previously done by
-hand. % TODO: and in a spreadsheet!
-Thus we can verify the output of the R implementation against 
-that obtained through mental arithmetic. Compare
-the following listing with \cref{finalout}: are the weights the same?
+% At this stage you should switch to running the code in `simple.R'. In RStudio
+% to run a line of code from the top left window, simply press \verb Ctl-Enter .
+Continue to enter the code contained in `simple.R' line by line to constrain
+by the second constraint, sex.
+Notice that we have done in code what was previously done by
+hand and in a spreadsheet. % TODO: and in a spreadsheet!
+Depending on which method you feel most comfortable with, it is worth
+spending time repeating the previous steps to ensure they make sense.
+
+The other advantage of running the same process 3 times in 3 different ways
+is that we can cross-compare the results from each.
+Compare
+the following listing with \cref{finalout}, for example: are the weights the same?
 
 \begin{lstlisting}[float=h, caption={W(3) after constraining by age and sex in R. 
 Compare with \cref{finalout}}]
@@ -939,9 +1006,26 @@ see how the weights change.
 
 % \subsection{Processing the output}
 
-% \subsection{Mapping the results}
-\section{Applying the technique in the real world} \label{smeval}
-Here we will continue with the cakeMap model we ran in the previous section.
+\subsection{Integerisation}
+Integerisation is critical to the utility of spatial microdata generated
+by IPF such as the results generated for cakeMap. This is because
+many of the most useful things we can do with individual-level data can only
+be done with \emph{whole individuals}. The weight matrices we have generated, however,
+are \emph{fractional weights}, which could imply, for example that 0.837 of an
+individual resides in a zone. From the perspective of an agent based (but not
+aggregated level) model, this is clearly impossible.
+
+Here is not to delve into the various methods available for integerisation ---
+see \citep{Lovelace2013-trs} for detail on the problem. Suffice to say that
+of the two broad approaches available, deterministic and probabilistic, the latter
+is found to generate more accurate results.
+
+The script needed to \emph{integerise} the final weights of the cakeMap model
+is called `pp-integerise.R' and resides in the `data/cakeMap' folder.
+We will not describe the method here (see \citealp{Lovelace2013-trs} for more).
+The important thing to remember from this script is that whole individuals result
+and these are allocated to the areas. From this point onwards, the modelling and
+analysis applications should be comparatively straightforward.
 
 \subsection{Model checking and validation}
 To make an analogy with food safety standards, openness about mistakes is
@@ -951,17 +1035,37 @@ comparing the model results with knowledge of how it \emph{should}
 perform \emph{a-priori} (model checking) and 2) comparison between the model
 results and empirical data (validation).
 
-A proven method of checking that data analysis and processing is working
-is wide ranging and continual visual exploration of its output
-\citep{janert2010data}.
+Within the two R scripts we have been using for reweighting the individual-level
+data so far (`simple.R' and `cMap.R'),
+there are \emph{already} commands whose function is to check the
+results are as expected. Returning to the former, note that on line 24
+of `simple.R', the fit between the survey data and census data is
+tested with \texttt{sum(abs(ind.agg - cons)) \# the total absolute error}.
+This, as the comment implies, calculates the total absolute error
+(TAE), which is a good measure of the fit between two aggregate-level
+datasets and which is defined by the following formula:
 
-% \subsection{Model validation}
-% \label{meval}
-% % {\color{red} Should this section be in a later chapter?} !!!
+\begin{equation}
+ TAE = \sum\limits_{ij}|U_{ij} - T_{ij}|
+\end{equation}
+
+Standardised Total Error is a related measure: $SAE = TAE/P$
+where $P$ is the total population of the study area.
+Thus TAE is sensitive to the number of people
+within the model. SAE is not --- see more on model checking and tests of
+fin in \citet{Lovelace2013-trs}
+
+Note that TAE is calculated twice more in `simple.R', after each
+additional constraint has been applied. Work through the code slowly and
+check how TAE reduces after each constraint and each iteration.
+
 Beyond typos or simple conceptual errors in model code, more fundamental
 questions should be asked of spatial microsimulation models. The validity
 of the assumptions on which they are built, and the confidence one should have
-in the results are important.
+in the results are important. For this we need external datasets.
+Validation is therefore a tricky topic --- see \citet{Edwards2009} for
+more on this and \cref{sanalysis} for (an albeit unreliable) comparison
+between estimated cake consumption and external income estimates.
 
 \subsection{Visualising the results}
 Visualisation is an important part of communicating quantitative
@@ -991,17 +1095,17 @@ from the second object based on the linking variable (in this case ``id'').
 Also in that script file you will encounter the function \verb fortify ,
 the purpose of which is to convert the spatial data object into a
 data frame. More on this process is described in \citet{lovelace2014introduction}.
-The final map result of `cakeMapPlot.R' is illustrated below (\cref{fcmap}).
+The final map result of `cakeMapPlot.R' is illustrated \cref{fcmap}.
 
-\begin{figure}
+\begin{figure}[h]
  \centering
-\includegraphics[width=12cm]{cakeMap}
+\includegraphics[width=11cm]{cakeMap}
 \caption{Choropleth map of the spatial distribution of average frequency of
 cake consumption in West Yorkshire, based on simulated data.} 
 \label{fcmap}
 \end{figure}
 
-\subsection{Analysis}
+\subsection{Analysis} \label{sanalysis}
 
 Once a spatial microdataset has been generated that we are happy with,
 we will probably want to analyse it further. This means exploring it --- its main features,
@@ -1034,8 +1138,8 @@ summary(imd$NAME %in% wards$NAME)
 The above code first joins the two datasets together and then checks the result by
 seeing how many matches names there are. In practice the fit between old names and new
 names is quite poor: only 71 out of 124. In a proper analysis we would have to solve this
-problem (e.g. via the command \verb pmatch ~ whhich stands for partial match).
-For the purposes of this excercise we will simply plot income against
+problem (e.g. via the command \verb pmatch ~ which stands for partial match).
+For the purposes of this exercise we will simply plot income against
 simulated cake consumption to gain a feeling what
 it tells us about the relationship between cake consumption and wealth (\cref{incomeCake}).
 
@@ -1063,7 +1167,7 @@ illustrated in \cref{hm}.
 
 \begin{figure}
 \centering
- \includegraphics[width=11cm]{hm}
+ \includegraphics[width=8cm]{hm}
 \caption{Relationship between social class and cake consumption in the
 individual level data.}
 \label{hm}
@@ -1185,8 +1289,8 @@ variables: name and height:
 \begin{verbatim}
  data.frame(name = c("Robin", "Phil"), height.cm = c(172, 174))
 \end{verbatim}
-Note that each new variable is entered using the command \verb c() . This is
-how R creates objects with the \emph{vector} data class --- a one dimensional
+Note that each new variable is entered using the command \verb c() --- this is
+how R creates objects with the \emph{vector} data class, a one dimensional
 matrix --- and that text data must be entered in quote marks.
 \item \textbf{Deterministic reweighting} is an approach to generating spatial
 microdata that allocates fractional weights to individuals based on how representative
@@ -1194,7 +1298,7 @@ they are of the target area. It differs from combinatorial optimisation approach
 that it requires no random numbers. The most frequently used method of deterministic
 reweighting is IPF.
 \item \textbf{For loops} are instructions that tell the computer to run a certain
-set of command repeatedly. \emph{i in for(1:9) {print i}}, for example will print
+set of command repeatedly. \texttt{for(i in 1:9) {print(i)}}, for example will print
 the value of i 9 times. The best way to further understand for loops is to try them
 out.
 \item \textbf{Iteration}: one instance of a process that is repeated many times until

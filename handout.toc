@@ -1,22 +1,25 @@
 \contentsline {section}{\numberline {1}Foundations}{2}{section.1}
 \contentsline {subsection}{\numberline {1.1}Prerequisites for this practical}{2}{subsection.1.1}
-\contentsline {subsection}{\numberline {1.2}Learning by doing}{2}{subsection.1.2}
+\contentsline {subsection}{\numberline {1.2}Learning by doing}{3}{subsection.1.2}
 \contentsline {subsection}{\numberline {1.3}Input data}{4}{subsection.1.3}
 \contentsline {subsection}{\numberline {1.4}The IPF equation}{5}{subsection.1.4}
 \contentsline {subsection}{\numberline {1.5}Re-aggregation after the first constraint}{6}{subsection.1.5}
-\contentsline {subsection}{\numberline {1.6}Test your understanding: the second constraint}{7}{subsection.1.6}
-\contentsline {subsection}{\numberline {1.7}IPF in a spreadsheet}{8}{subsection.1.7}
-\contentsline {subsection}{\numberline {1.8}IPF in R: a simple example}{8}{subsection.1.8}
-\contentsline {subsection}{\numberline {1.9}Iterations}{10}{subsection.1.9}
-\contentsline {section}{\numberline {2}CakeMap: A worked example}{10}{section.2}
-\contentsline {subsection}{\numberline {2.1}Loading and preparing the input data}{11}{subsection.2.1}
-\contentsline {subsection}{\numberline {2.2}Performing IPF on the CakeMap data}{12}{subsection.2.2}
-\contentsline {section}{\numberline {3}Applying the technique in the real world}{13}{section.3}
-\contentsline {subsection}{\numberline {3.1}Model checking and validation}{13}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Visualising the results}{13}{subsection.3.2}
-\contentsline {subsection}{\numberline {3.3}Analysis}{14}{subsection.3.3}
-\contentsline {section}{\numberline {4}Discussion}{16}{section.4}
-\contentsline {section}{\numberline {5}Glossary}{17}{section.5}
-\contentsline {section}{\numberline {6}Acknowledgements}{18}{section.6}
-\contentsline {section}{\numberline {7}References}{18}{section.7}
+\contentsline {subsection}{\numberline {1.6}Test your understanding: the second constraint}{6}{subsection.1.6}
+\contentsline {subsection}{\numberline {1.7}IPF in a spreadsheet}{7}{subsection.1.7}
+\contentsline {section}{\numberline {2}IPF in R}{7}{section.2}
+\contentsline {subsection}{\numberline {2.1}Loading and exploring the input data}{8}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Reweighting by the age constraint}{10}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Re-aggregation}{10}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.4}Iterations}{11}{subsection.2.4}
+\contentsline {section}{\numberline {3}CakeMap: A worked example}{11}{section.3}
+\contentsline {subsection}{\numberline {3.1}Loading and preparing the input data}{11}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Performing IPF on the CakeMap data}{12}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.3}Integerisation}{14}{subsection.3.3}
+\contentsline {subsection}{\numberline {3.4}Model checking and validation}{14}{subsection.3.4}
+\contentsline {subsection}{\numberline {3.5}Visualising the results}{15}{subsection.3.5}
+\contentsline {subsection}{\numberline {3.6}Analysis}{15}{subsection.3.6}
+\contentsline {section}{\numberline {4}Discussion}{17}{section.4}
+\contentsline {section}{\numberline {5}Glossary}{19}{section.5}
+\contentsline {section}{\numberline {6}Acknowledgements}{19}{section.6}
+\contentsline {section}{\numberline {7}References}{20}{section.7}
 \vspace {2em}
