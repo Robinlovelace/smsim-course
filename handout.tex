@@ -541,7 +541,7 @@ This section explains how the IPF
 \emph{algorithm} described above is implemented in R, using the
 same input data. Now we will be working within the RStudio
 environment with the `smsim-course' project 
-loaded with the `simple.R' file loaded in the top left script tab
+loaded and the `simple.R' file open in the top left panel
 (\cref{frsimple}). 
 
 \begin{figure}
@@ -865,7 +865,6 @@ similar steps will be needed to use your own data as an input into a
 spatial microsimulation model.
 
 \subsection{Loading and preparing the input data}
-
 The raw constraint variables for CakeMap were downloaded from
 the Infuse website (\href{http://infuse.mimas.ac.uk/}{infuse.mimas.ac.uk/}).
 These, logically enough, are stored in the `cakeMap/data/' directory
@@ -879,6 +878,7 @@ in a spatial microsimulation model. `con1.csv' stands for
 
 \begin{figure}
  \includegraphics[width=12cm]{raw-data-screenshot}
+\centering
 \caption{The raw input data for the CakeMap model, downloaded from the InFuse website.}
 \label{fraw}
 \end{figure}
@@ -1176,18 +1176,19 @@ individual level data.}
 \section{Discussion}
 
 What have we learned during the course of this practical tutorial?
-Given that it was geared towards beginners, from one perspective
+Given that it's geared towards beginners, from one perspective
 one could say `not a lot' relative to the many potential applications.
 The emphasis on understanding of the basics was deliberate: it is only
 on strong foundations that large and long-lived buildings can be 
 constructed and the same applies to geographical research.
 
-The focus on strong foundations is also sensible because the
-number of people actively involved in spatial microsimulation research,
-let alone development of new software and methods, is very small.
+The focus on foundations is also due to the nature of spatial microsimulation
+research: few people are actively involved in applied work, let alone the
+development of new software and methods.
 Specialist skills and understanding are needed to join this research area
-and a central outcome of this course has been to provide these.
-More specifically, we have learned how to:
+yet the barriers to entry are high.
+A central outcome of this course has been to provide an accessible `way in'
+to this exciting research area. Specifically, we have learned how to:
 \begin{itemize}
  \item Perform iterative proportional fitting, one of the commonly used
 techniques for spatial microsimulation, by hand, in a spreadsheet and in R.
@@ -1198,26 +1199,27 @@ join this with output with geographics zones.
  \item Map the result and begin to look for explanation in the dataset.
 \end{itemize}
 
-One important thing that the cakeMap example should have taught you is
-about the dangers and limitations of using spatial microsimulation.
-Most of the people who read articles based on the spatial microsimulation
-will not understand the technical details of the method. Therefore, great
+An important lesson from the cakeMap example is
+that spatial microsimulation can be used in careless and misleading ways.
+The method is powerful, but it has dangers and limitations that must be ackowledged.
+Many articles on spatial microsimulation omit technical details of the method,
+let alone code that would allow the findings to be reproduced. Great
 care must be taken not to mislead.
 
-It is, for example, untrue to say
-that we have demonstrated cake consumption to be higher in wealthy areas of Leeds.
-We have done nothing of the sort! We have merely created a synthetic individual-level
-dataset for Leeds based on 3 constraint variables and allocated these individuals to zones.
+Returning to cakeMap, we have \emph{not}
+demonstrated cake consumption to be higher in wealthy areas of Leeds.
+We have done nothing of the sort! We \emph{have} created spatial microdata
+for Leeds based on 3 constraint variables.
 This spatial microdataset is not `real'. We can have a high level of confidence that the
-values for the constraint variables are correct for this spatial microdataset but the joint distribution
-(e.g. the cross tabulation between age and car ownership) will tend towards the average
+individual attributes constrained by census data are roughly representative of the region.
+Yet the interrelationship between these constraint variables
+(e.g.~the cross tabulation between age and car ownership) will tend towards the average
 contained within the survey microdataset and is likely to mask regional variability. In an ward
 where the proportion of young drivers is very high, for example, our model result is likely
-to provide underestimates of the numbers of young people owning cars whilst overestimating
-the number of older people owning cars.
+to provide underestimates of the numbers of young people owning cars.
 
 The estimates generated for the target variable --- cake consumption --- are likely to be
-even further from reality. They simply reflect the relationship between cake consumption and
+far from reality. They reflect the relationship between cake consumption and
 a selection of constraint variables at the national level. Do we have good evidence to suggest
 that age/sex, socio-economic class and household car ownership are good proxies of cake consumption
 across different parts of the country? No. So we should treat the results as what they are:
@@ -1268,7 +1270,7 @@ At worst, it can waste valuable research time, create misleading results
 and shroud academic research behind an impenetrable wall of jargon.
 
 We have little doubt that the vast majority of
-people will the former option. This course has hopefully
+people will prefer the former option. This course has hopefully
 equipped its students with
 the tools to pursue this lofty aim.
 
@@ -1328,7 +1330,7 @@ or status.
 
 % \lhead{\emph{Bibliography}}  % Change the left side page header to
 % \fancyhead[LO,RE]{\emph{Bibliography}}
-\bibliographystyle{model2-names}  % Use the "unsrtnat" BibTeX style for
+\bibliographystyle{plainnat}  % Use the "unsrtnat" BibTeX style for
 % \bibliography{library, lincluded}  % The references (bibliography) information are stored
 \bibliography{Microsimulation}  \label{Bibliography}
 % ,Microsimulation.bib
