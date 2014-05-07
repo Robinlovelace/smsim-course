@@ -12,5 +12,7 @@ Spatial microsimulation is a statistical method by which individual-level data i
 
 We take an explicitly practical and pragmatic approach to spatial microsimulation. By the end of the course attendees should be able to harness spatial microsimulation for their own needs by modifying the example code for their own datasets. To this end the course uses [R](http://www.r-project.org/), a free, open source and extensible statistical language.
 
-No prior knowledge in either R or spatial microsimulation is assumed: we will begin from first principles, using simple examples to ensure understanding of every step. Content too will be directed to participants' needs; all teaching material will be provided with explanation of how to modify example code for tackling specific research problems.
+No prior knowledge in either R or spatial microsimulation is assumed: we will begin from first principles, using simple examples to ensure understanding of every step. Content too will be directed to participants' needs; all teaching material will be provided with explanation of how to modify example code for tackling specific research problems. The slides below provide a more detailed introduction.
+
+<script async class="speakerdeck-embed" data-id="50385010b7ff0131c8ae22d978a77c84" data-ratio="1.33333333333333" src="//speakerdeck.com/assets/embed.js"></script>
 
