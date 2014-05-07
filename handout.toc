@@ -17,7 +17,7 @@
 \contentsline {subsection}{\numberline {3.3}Integerisation}{14}{subsection.3.3}
 \contentsline {subsection}{\numberline {3.4}Model checking and validation}{14}{subsection.3.4}
 \contentsline {subsection}{\numberline {3.5}Visualising the results}{15}{subsection.3.5}
-\contentsline {subsection}{\numberline {3.6}Analysis}{15}{subsection.3.6}
+\contentsline {subsection}{\numberline {3.6}Analysis}{16}{subsection.3.6}
 \contentsline {section}{\numberline {4}Discussion}{17}{section.4}
 \contentsline {section}{\numberline {5}Glossary}{19}{section.5}
 \contentsline {section}{\numberline {6}Acknowledgements}{19}{section.6}
