@@ -1,0 +1,72 @@
+# Example session to demonstrate R's capabilities
+
+R can behave just like any calculator - it understands numbers!
+
+```{r}
+1
+
+1 + 1
+
+(1 + 5) / 3
+# now try some of your own calculations
+```
+
+R also allows collections of numbers to be operated on at once.
+Collections of text and numbers can be assigned names - these are *objects*.
+
+```{r}
+c(1, 2, 3) / 2 # note that each number is divided by 2 - it knows what you mean
+
+x <- c(1, 2, 3) # assign the numbers to an object
+x * 5
+x^3
+x * x
+
+y <- c(4, 2, 1)
+plot(x, y) # very basic plotting
+lines(x,y)
+```
+
+R is very versatile. It can do almost *anything* involving numbers and
+text. However, it was designed to work with fairly large datasets. Let's load one:
+
+```{r}
+# navigate to data - modify this depending on your dataset:
+df <- read.csv("~/repos/smsim-course/data/cakeMap/ind.csv") 
+head(df) # this asks R to print the top rows of the file
+summary(df$Car) # note the use of the $ symbol to specify columns
+summary(df$ageband4) # note the output is different - this is because of the type of data:
+class(df$Car) # this was recognised by R as numeric integer data
+class(df$ageband4) # this is factor data
+```
+
+Let's explore the data a little - can we identify a link between cake consumption and class?
+
+```{r}
+table(df$NCakes, df$NSSEC8)
+```
+
+Perhaps, but let's recategorise the cake data so it's numeric:
+
+```{r}
+library(car) # load a new package - try install.packages("car") if this fails
+levels(df$NCakes) <- c(0.5, 1.5, 4, 10, 0.1)
+df$NCakes <- as.numeric(as.character(df$NCakes))
+class(df$NCakes)
+class(df$NSSEC8)
+df$NSSEC8 <- paste0("ns",df$NSSEC8)
+aggregate(df$NCakes ~ df$NSSEC8, mean, data=df)
+```
+
+How does cake consumption vary by age? Again, R can tell us:
+
+```{r}
+aggregate(df$NCakes ~ df$ageband4, mean, data=df)
+```
+
+
+This ability to use numbers in a general purpose way and
+handle large datasets makes R extremely flexible.
+The flexibility also means R is hard - this is why we need tutorials
+like this one to see how it works.
+
