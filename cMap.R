@@ -97,4 +97,4 @@ t1$numit<-1:nrow(t1)
 ############## Plot the results #############
 # plot the increasing fit, one interation to the next 
 barplot(height=t1[,2], names.arg=t1[,1], ylim=c(t1[1,2],1), ylab=("Correlation (r)"))
-source("data/cakeMap/TRS-integerisation.R") # creates integer output (intall) and cakes
+source("data/cakeMap/pp-integerise.R") # creates integer output (intall) and cakes

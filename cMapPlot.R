@@ -1,8 +1,9 @@
 # script for plotting the output of cMap
 # must be run after cMap.R and TRS-integerisation.R
 
-# load the prerequisite packages
-x <- c("ggplot2", "dplyr", "sp")
+# load the prerequisite packages - you may need to install these 
+# e.g install.packages("ggplot2")
+x <- c("ggplot2", "dplyr", "sp", "rgeos", "rgdal", "ggmap")
 lapply(x, require, character.only = T)
 
 # save geographic names to the cakes output
@@ -22,10 +23,11 @@ names(wards)
 names(geocakes)[1] <- names(wards)[1] <- "id" # rename geocakes' geonames for join
 head(geocakes)
 head(wards@data)
-head(join(wards@data, geocakes))
-wards@data <- join(wards@data, geocakes)
+head( left_join(wards@data, geocakes))
+wards@data <- left_join(wards@data, geocakes)
 
 # fortify the data for ggplot2
+# you'll need to install.packages("rgeos") if not already installed
 wardsF <- fortify(wards, region="id")
 head(wardsF)
 names(wards)
@@ -39,12 +41,9 @@ bb[2, ] <- (b[2, ] - mean(b[2, ])) * 1.05 + mean(b[2, ])
 b[1, ] <- (b[1, ] - mean(b[1, ])) * 1.7 + mean(b[1, ])
 b[2, ] <- (b[2, ] - mean(b[2, ])) * 1.7 + mean(b[2, ])
 
-
 # map the result!
 ggplot() + 
   geom_polygon(data=wardsF, aes(long, lat, group=group, fill=avCake), color = "black", alpha=0.2)
-library(ggmap)
-library(rgdal)
 baseMap <- get_map(location=bb, maptype="terrain")
 # baseMap <- get_map(location=b, zoom=10, source='osm')
 #  baseMap <- get_map(location=b, source='stamen')
@@ -86,7 +85,9 @@ mean(ind$avnumcakes[ ind$NSSEC8 == "8" | ind$NSSEC8 == "7" | ind$NSSEC8 == "6" ]
 (hm  <-  table(ind$NCakes, ind$NSSEC8))
 heatmap(hm)
 heatmap(hm, Rowv=NA, Colv=NA)
-library(gplots)
+
+library(gplots) # for another kind of heat map
+
 heatmap.2(hm, Rowv=NA, Colv=NA, xlab = "Socio-economic class", ylab = "Frequency of cake consumption")
 hmm <- melt(hm)
 ggplot(hmm) + geom_tile(aes(Var1, as.character(Var2), fill = value)) +
