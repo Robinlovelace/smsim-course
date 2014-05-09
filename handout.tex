@@ -706,6 +706,14 @@ the results of doing IPF on the computer with the results obtained by hand.
 % ## [1] TRUE TRUE TRUE TRUE TRUE
 % \end{lstlisting}
 
+Using the subset command just introduced, we must now subset the constraint (\verb cons ) data frame so we can access each constraint (age or sex) separately. Using your knowledge of the subsetting command, we select columns 1 to 2, and 3 to 4 leaving all rows in place. Give these subsets (constraints) the name \verb con1  and \verb con2  respectively:
+
+\begin{lstlisting}[float=h, caption={Subsetting the constraint file}]
+con1 <- cons[ ,1:2]
+con2 <- cons[ ,3:4]
+\end{lstlisting}
+
+
 To make the individual level dataset comparable to the aggregate level we must
 first categorise it and count the number in each category. This job is
 performed by the R \emph{script} categorise.R, contained in the `simple' data
