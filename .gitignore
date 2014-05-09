@@ -6,6 +6,8 @@
 .Rhistory
 .RData
 *.blg
+*.html
+ggmapT*
 *.aux
 *.idx
 *.ilg
