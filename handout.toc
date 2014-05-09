@@ -12,14 +12,14 @@
 \contentsline {subsection}{\numberline {2.3}Re-aggregation}{10}{subsection.2.3}
 \contentsline {subsection}{\numberline {2.4}Iterations}{11}{subsection.2.4}
 \contentsline {section}{\numberline {3}CakeMap: A worked example}{11}{section.3}
-\contentsline {subsection}{\numberline {3.1}Loading and preparing the input data}{11}{subsection.3.1}
-\contentsline {subsection}{\numberline {3.2}Performing IPF on the CakeMap data}{12}{subsection.3.2}
+\contentsline {subsection}{\numberline {3.1}Loading and preparing the input data}{12}{subsection.3.1}
+\contentsline {subsection}{\numberline {3.2}Performing IPF on the CakeMap data}{13}{subsection.3.2}
 \contentsline {subsection}{\numberline {3.3}Integerisation}{14}{subsection.3.3}
 \contentsline {subsection}{\numberline {3.4}Model checking and validation}{14}{subsection.3.4}
 \contentsline {subsection}{\numberline {3.5}Visualising the results}{15}{subsection.3.5}
-\contentsline {subsection}{\numberline {3.6}Analysis}{16}{subsection.3.6}
+\contentsline {subsection}{\numberline {3.6}Analysis}{15}{subsection.3.6}
 \contentsline {section}{\numberline {4}Discussion}{17}{section.4}
 \contentsline {section}{\numberline {5}Glossary}{19}{section.5}
-\contentsline {section}{\numberline {6}Acknowledgements}{19}{section.6}
+\contentsline {section}{\numberline {6}Acknowledgements}{20}{section.6}
 \contentsline {section}{\numberline {7}References}{20}{section.7}
 \vspace {2em}
