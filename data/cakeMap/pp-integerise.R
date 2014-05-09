@@ -1,13 +1,14 @@
 ### Proportional probabilities integerisation algorithm
 ### Run in current state after running IPF script in smsim-course repo - 
 # e.g. etsim.R, simple.R or cMap.R
+object.size(intall) / 1000000
+head(intall[[100]])
 
-intp <- floor(fw) # truncated final weights
 ints <- as.list(1:nrow(cons)) # Names of integer results, in ordered list
 intall <- list(1:nrow(cons))  # Row data, ready to be filled with integer weights
 intcat <- ints
 intagg <- cons * 0 # Aggregate area stats
-prop.weights <- matrix(1, nrow=nrow(ind), ncol=nrow(cons))
+prop.weights <- fw # set the weights
 pops <- popints <- rowSums(con1)
 cakes <- data.frame(avCake = rep(0,nrow(cons)), sdCake = rep(0,nrow(cons)))
 

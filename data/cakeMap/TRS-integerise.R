@@ -1,3 +1,5 @@
+# truncate, replicate sample method
+
 set.seed(0) # include this line to ensure repeatable results
 for (i in 1:nrow(cons)){
   if(max(intp[,i]) ==0) intp[which.max(fw[,i]),i] <- 1 # ensures model will run in case max(i5.w5 < 1) thanks to Eveline van Leeuwen

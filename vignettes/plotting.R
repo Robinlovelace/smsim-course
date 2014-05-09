@@ -4,7 +4,7 @@
 # test the plotting works:
 library(reshape2) # load this package for reformating the data
 
-ind.agg.melted <- melt(indf[,,2,1,1]) # this refers to [area,category,constraint,iteration,dummy]
+ind.agg.melted <- melt(indf[,,3,1,1]) # this refers to [area,category,constraint,iteration,dummy]
 head(ind.agg.melted) # take a look at our melted dataset
 
 cons.melted <- melt(cons)
