@@ -1,16 +1,1 @@
-
-.Rproj.user
-*.out
-*.log
-*.bbl
-.Rhistory
-.RData
-*.blg
-*.html
-ggmapT*
-*.aux
-*.idx
-*.ilg
-*.ind
-*.tex.backup
-*.tex~
+_site/
