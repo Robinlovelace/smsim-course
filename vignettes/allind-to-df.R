@@ -2,7 +2,7 @@
 
 head(intall[[1]]) # top of 1st individuals
 # intall is a list of data frames
-each element is a zone
+# each element is a zone
 
 # Let's join together the zones.
 intall.df <- cbind(intall[[1]], zone = 1)

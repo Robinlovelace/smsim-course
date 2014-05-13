@@ -1,7 +1,0 @@
-encoding: utf-8
-markdown: redcarpet
-baseurl: /smsim-course/
-url: robinlovelace.github.io/smsim-course/
-permalink: /:title/
-ga_tracking_code:
-disqus_shortname: robinlovelace

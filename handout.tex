@@ -83,7 +83,9 @@ at the outset what we will and will not be covering.
 basis of all spatial microsimulation models, using \emph{iterative
 proportional fitting} (IPF). IPF is
 an efficient method for allocating individuals from a
-non-spatial dataset to geographical zones. There are other ways of generating
+non-spatial dataset to geographical zones, analogous to the
+`Furness method' in transport modelling, but with more constraints.
+There are other ways of generating
 spatial microdata but, as far as the author is
 aware,\footnote{There is much need
 to compare different methods of generating spatial microdata, for example by
@@ -391,7 +393,7 @@ marginal total of the small area constraint, $s$
 (Table \ref{t:s}) and $mT(n)_{i}$ is the marginal total of category
 $j$ of the aggregated results of the weighted
 microdata, $m$ (Table \ref{t:m}).
-$n$ represents the iteration number.
+$n$ represents the contraint number.
 
 Do not worry about completely understanding the above procedure for now, its
 meaning will probably take time to sink in.
@@ -466,7 +468,7 @@ marks.  % Add online link to answers - tinyurl
 
 \begin{equation}
 w(3) = (\frac{6 \times \frac{4}{3}}{6 \frac{2}{3}},\;\;\; \frac{6 \times
-\frac{\;4\;}{\;3\;}}{\;?\;},\;\;\; \boldsymbol{ \frac{\color{blue}4 \times 6}{\color{blue} 6\frac{2}{3}
+\frac{\;4\;}{\;3\;}}{\;?\;},\;\;\; \boldsymbol{ \frac{\color{blue}6 \times 4}{\color{blue} 6\frac{2}{3}
 }}, \;\;\;\frac{\;?\; \times \;?\;}{?}, \;\;\;\frac{4 \times 6}{5 \frac{1}{3}})
 % w(3) = (\frac{6}{5}, \frac{6}{5}, \frac{18}{5}, \frac{3}{2}, \frac{9}{2})
 \end{equation}
@@ -836,14 +838,15 @@ weights3[,1] # check the weights allocated for zone 1
 In the above example, we have seen the `bare bones' of spatial microsimulation
 using IPF to generate weights from which sample populations can be created.
 To perform multiple iterations of the same model, we have prepared a slightly
-more complex script than `simple.R' called `etsim.R' that can be found in the
-`data/simple/' folder. Th etsim script
-generates weights for as many iterations as you please (just
+more complex script than `simple.R' called `simple-iterations.R' that can 
+also be found in the project's root directory. We set the number
+of iterations manually (just
 change the value of \verb num.its ). This happens by calling another
-script called `e2.R' which is simply run repeatedly for each iteration. 
+script called `e2.R' which runs the re-weighting process
+repeatedly, once for each iteration. Notice that only 2 full
+iterations, the perfect solution is reached (r = 1).
 
-There
-is great scope for taking the analysis further:
+There is great scope for taking the analysis further:
 some further tests and plots are presented on the on-line
 versions of this section. The simplest case is contained in
 Rpubs document \href{http://rpubs.com/RobinLovelace/6193}{rpubs.com/RobinLovelace/6193} 
@@ -1019,25 +1022,107 @@ see how the weights change.
 % \subsection{Processing the output}
 
 \subsection{Integerisation}
-Integerisation is critical to the utility of spatial microdata generated
-by IPF such as the results generated for cakeMap. This is because
-many of the most useful things we can do with individual-level data can only
+Integerisation increases the utility of results generated
+by IPF, such as the weights produced in the cakeMap example.
+Many of the most useful things we can do with individual-level data can only
 be done with \emph{whole individuals}. The weight matrices we have generated, however,
-are \emph{fractional weights}, which could imply, for example that 0.837 of an
+are \emph{fractional weights}, which could imply, for example that 0.437 of an
 individual resides in a zone. From the perspective of an agent based (but not
-aggregated level) model, this is clearly impossible.
+aggregated level) model, this is clearly absurd.
 
-Here is not to delve into the various methods available for integerisation ---
+Here is not the place to delve into the various methods available for integerisation ---
 see \citep{Lovelace2013-trs} for detail on the problem. Suffice to say that
 of the two broad approaches available, deterministic and probabilistic, the latter
 is found to generate more accurate results.
 
-The script needed to \emph{integerise} the final weights of the cakeMap model
-is called `pp-integerise.R' and resides in the `data/cakeMap' folder.
-We will not describe the method here (see \citealp{Lovelace2013-trs} for more).
-The important thing to remember from this script is that whole individuals result
-and these are allocated to the areas. From this point onwards, the modelling and
+Two scripts to \emph{integerise} the final weights (referred to as \texttt{fw}
+in the code) of the cakeMap model
+are provided: `pp-integerise.R' and `TRS-integerise.R', which stand for
+`proportional probabilities' and `truncate, replicate, sampe'.
+These reside in the `data/cakeMap' folder.
+We will not describe the theory underlying the method here (see \citealp{Lovelace2013-trs} for more).
+Instead, we will describe a few of the functions contained in these scripts that are
+the keys to understand how they work. Both scripts begin by creating
+a series of objects that are used during the integerisation process
+and to save the results \cref{intobjects}.  
+
+\begin{lstlisting}[float=h, caption={The new objects that
+are created in at the beginning of the integerisation scrips (see lines 7 to 8 in `pp-integerise.R' and
+`TRS-integeris.R').}, label=intobjects]
+intall <- ints <- as.list(1:nrow(cons)) 
+intagg <- cons * 0
+\end{lstlisting}
+
+In the first line of \cref{intobjects}, two identical objects are created
+(note the double use of the \texttt{<-} object assignment symbol).
+These are set objects in the list class, allowing each element to be
+allocated as any other object. This differs from the stricter
+`data.frame' and `matrix' or `array' objects we have been using so far.
+Subsequently in the script, individual elements are referred to using
+double square brackets. For example, see \texttt{ints[[i]] <-} on line
+15 of `pp-integerise.R'. Using list elements provides flexibility:
+we can set any list object to be anything we like without
+worrying about constraints imposed by its class or dimensions.
+
+The key function in the proportional probabilities
+script is \texttt{sample}, used in a for loop over
+all areas (\cref{pp-sample}).
+
+\begin{lstlisting}[float=h, caption={The sample function,
+key to R's implementation of the proportional probabilities
+integerisation algorithm (see lines 15 and 16 of `pp-integerise.R').}, label=pp-sample]
+ints[[i]] <- sample(which(fw[,i] > 0), size = sum(con1[i,]), 
+                      prob=fw[,i], replace = T) 
+\end{lstlisting}
+
+The \texttt{sample} function in \cref{pp-sample} contains four arguments, and
+the meaning of each is described below:
+\begin{itemize}
+ \item The first item (\texttt{which(fw[,i] > 0)}) provides the \emph{vector} of
+numbers or characters from which the sample will be drawn. In this case we are referring
+to the weights of all individuals for zone i (all weights should be above 0).
+\item The size argument tells R how many items from the object should be selected.
+In this case it is simple: the total population of zone i.
+\item The cleverest thing about R's sampling function is that it allows probabilities
+of being selected to be assigned to each element. Here we are setting the probability
+of selection as proportional to the final weight. (Clearly the probability of
+selection can never be greater than 1, as is the case with many weights; R
+automatically normalises the values.)
+\item The final argument tells R that we want to allow repeat sampling:
+the same individual can be selected more than once. This makes sense in a
+dataset where wheights can get very large: an individual with a weight of 10.4,
+for example, should ideally be selected between 10 and 11 times.
+\end{itemize}
+
+Note that `trs-integerise.R' also uses the sample function, in this case to
+`top up' individuals already selected from the `truncate, replicate' stages
+of the `truncate, replicate, sample' method \citep{Lovelace2013-trs}.
+For more information on implementing TRS in R, refer to this paper and the paper's detailed
+\href{http://eprints.whiterose.ac.uk/77037/7/lovelacesupplement-3.pdf}{supplementary information},
+which provides reproducible results to suggest using TRS for accuracy.
+(As an aside, the accuracy of each integerisation algorithm was
+tested on the cakeMap data --- showing TRS to yield better results for this application.
+The results can be reproduced by running the `integerisation-test.R'
+script, \href{https://github.com/Robinlovelace/smsim-course/tree/master/vignettes}{located in the `vignettes' folder}.)
+
+The most useful result of these integerisation algorithms is the object \texttt{intall}.
+This is list of data frames containing, each containing a population equal
+to the population of its respective zone. Each has the same
+variables as are present in the original survey dataset. Make
+this object easier to analyse, a series of commands is provided
+(but commented out) at the end of the script to convert the list into
+a more manageable data.frame object. Try entering
+\texttt{nrow(intall.df)} after running this code (remove the comments first!)
+We have cloned hundreds of thousands of individuals.
+Clearly, all this data takes up more RAM on the computer, as can be seen by
+asking \texttt{object.size(intall.df)}. Try comparing this result with the
+size of the original survey dataset `ind'. From this point onwards,
+with the individual-level data in a straightforward dataframe
+(with the zone number kept in the `zone' column), the modelling and
 analysis applications should be comparatively straightforward.
+
+Next we move on to a vital consideration in
+spatial microsimulation models such as cakeMap: validation.
 
 \subsection{Model checking and validation}
 \label{svalid}
@@ -1267,7 +1352,7 @@ Underlying each of these points is a wider responsibility: to communicate one's 
 with clarity and transparency. Too much modelling research is shrouded in a cloud of jargon,
 unstated assumptions and verbose English. If nothing else, this tutorial should
 provide guidance on how to improve standards in the field and move towards best practice
-for reproducibility (see \citep{Peng2006})
+for reproducibility \citep{Peng2006}.
 
 Spatial microsimulation is a powerful tool.
 Like any powertool, it can acheive very useful results for its user
