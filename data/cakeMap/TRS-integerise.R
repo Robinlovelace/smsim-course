@@ -1,6 +1,6 @@
-### Proportional probabilities integerisation algorithm
+### Truncate, replicate sample (TRS) integerisation algorithm
 ### Run in current state after running IPF script in smsim-course repo - 
-# e.g. cMap.R
+# e.g. cMap.R - see Lovelace and Ballas (2013) for more information on this.
 # fw means 'final weights' and is used for the integerisation
 
 # set up the objects we'll be using subsequently
