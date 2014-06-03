@@ -1,0 +1,191 @@
+'Spatial microsimulation' in R: allocating individuals to zones
+========================================================
+
+This reproducible code shows how to use IPF to generate lists of individuals for individual zones using IPF.
+The input datasets are 3 constraint variables and an individual level dataset.
+We will work through the entire process to show how spatial microsimulation can be done in R.
+
+## Loading the input data
+The first stage is to load the input data, from an Excel spreadsheet in this case.
+
+```{r}
+# install.packages("gdata") # install gdata package if not already installed
+library(gdata) # load package for reading data
+ind <- read.xls("msim.xlsx", sheet="SAMPLING")
+head(ind)
+
+# load the constraints and check the totals add up
+con1 <- read.xls("msim.xlsx", "GENDER")[-1]; sum(con1)
+con2 <- read.xls("msim.xlsx", "AGE")[-1]; sum(con2)
+con3 <- read.xls("msim.xlsx", "ETHNICITY")[-1]; sum(con3)
+num.cons <- 3  # n. constraints - can set automatically: length(which(grepl("con[1-9]",ls()))))
+cons <- cbind(con1, con2, con3)
+cat.names <- names(cons)
+```
+
+## Converting the individual level data into a 0/1 "model matrix" for aggregation
+
+In order to compare individual level data with aggregate constraints,
+the aggregate data must be converted into a flat form, with counts
+for each of the categorise in the dataset:
+
+```{r}
+# creating 0/1 matrix representation of ind. data
+gender.cat <- model.matrix(~ind$GENDER -1 )
+age.cat <- model.matrix(~ind$AGE -1)
+eth.cat <- model.matrix(~ind$ETHNICITY - 1)
+ind.cat <-  cbind(gender.cat, age.cat, eth.cat)
+names(ind.cat) <- cat.names
+```
+
+
+## Create the weight matrix and initialise
+IPF *reweights* individuals for each zone (A to C in this case).
+For this we must first create a weight matrix.
+In fact, this will be a *weight array*, with a 2D matrix for each
+constraint, allowing for easy iteration through the constraints.
+
+```{r}
+weights <- array(dim=c(nrow(ind),nrow(cons),num.cons+1)) 
+weights[,,1] <- 1 # sets initial weights to 1
+```
+
+## Create aggregated output matrix and add values from individual inputs
+This stage creates an array for the aggregated outputs.
+Notice that `ind.agg` has the same dimension as `cons`,
+allowing for direct comparison between the two.
+This is the key to IPF!
+
+```{r}
+ind.agg <- array(dim=c(nrow(cons),ncol(cons),num.cons+1))
+for (i in 1:nrow(cons)){
+  ind.agg[i,,1]   <- colSums(ind.cat) * weights[1,i,1]}
+ind.agg[,,1] # look at what we've created - individual level data comparable w. cons
+```
+
+
+
+
+# The IPF part #############
+
+Now that all the data and objects used for the model have been set-up,
+we are ready to run the model. We constrain by one constraint at a time.
+
+```{r}
+# Re-weighting for constraint 1 via IPF 
+for (j in 1:nrow(cons)){
+  for(i in 1:ncol(con1)){
+    weights[which(ind.cat[,i] == 1),j,2] <- con1[j,i] / ind.agg[j,i,1]}}
+for (i in 1:nrow(cons)){ # convert con1 weights back into aggregates
+  ind.agg[i,,2]   <- colSums(ind.cat * weights[,i,1] * weights[,i,2])}
+# test results for first row (not necessary for model)
+ind.agg[1,,2] - cons[1,] # should be zero for age/sex
+cor(as.numeric(as.vector(ind.agg[,,2])), as.numeric(as.matrix(cons))) # how good is the correlation (fit)
+```
+
+## Second constraint
+```{r}
+for (j in 1:nrow(cons)){
+  for(i in 1:ncol(con2) + ncol(con1)){
+    weights[which(ind.cat[,i] == 1),j,3] <- cons[j,i] / ind.agg[j,i,2]}}  
+for (i in 1:nrow(cons)){ # convert con2 back into aggregate
+  ind.agg[i,,3] <- colSums(ind.cat * weights[,i,1] * weights[,i,2] * weights[,i,3])}
+ind.agg[1,,3] - cons[1,] # should be close to zero for new constraint
+cor(as.numeric(as.vector(ind.agg[,,3])), as.numeric(as.matrix(cons))) # how good is the correlation (fit)
+```
+
+## Third constraint
+```{r}
+for (j in 1:nrow(cons)){
+  for(i in 1:ncol(con3) + ncol(con1) + ncol(con2)){
+    weights[which(ind.cat[,i] == 1),j,4] <- cons[j,i] / ind.agg[j,i,3]}}
+for (i in 1:nrow(cons)){ # convert con3 back into aggregate
+  ind.agg[i,,4]   <- colSums(ind.cat * weights[,i,1] * weights[,i,2] * weights[,i,3] * weights[,i,4])}
+ind.agg[1:3,,4] - cons[1:3,] # test the result
+```
+
+## Improvements in model fit
+
+Notice that the fit of the model improves from one constraint to the next.
+What is the final model fit?
+
+```{r}
+cor(as.numeric(as.vector(ind.agg[,,4])), as.numeric(as.matrix(cons))) # how good is the correlation (fit)
+# you get a perfect fit between constraint data and results of model
+# why? because of the final weights:
+fw <- weights[,,1] * weights[,,2] * weights[,,3] * weights[,,4]
+head(fw) # cols are zones, rows are individuals
+```
+
+# Integerisation phase ###################
+
+We have allocated weights to the individuals for a good (perfect)
+model fit. These are the *maximum likelihood* or *maximum entropy* values
+to match the individuals with the zones.
+The final stage is to convert this *weight matrix* into a list of individuals for each zone.
+
+## Setting up objects for the integerisation phase
+
+```{r}
+intall <- ints <- as.list(1:nrow(cons)) # Names of integer indices (ints), and integer populations (intall) in ordered list
+intagg <- cons * 0 # Aggregate area stats - set to 0 to avoid confusion
+f <- floor(fw) # truncated weights
+d <- fw - f
+
+set.seed(0) # Include this line to ensure repeatable results
+```
+
+## Integerisation loop
+Here we sample individuals based on their weights.
+This is the Truncate Replicate Sample (TRS) method described by
+Lovelace and Ballas (2011).
+
+```{r}
+for (i in 1:nrow(cons)){
+  if(max(f[,i]) == 0) f[which.max(fw[,i]),i] <- 1 # ensures model will run in case max(i5.w5 < 1) thanks to Eveline van Leeuwen
+  ints[[i]] <- rep(which(fw[,i] > 0), f[,i])
+  s <- sample(which(fw[,i] > 0), size = sum(con1[i,]) - sum(f[,i]) , # sample using decimal weights to 'top up' selection
+              prob=d[,i], replace = F) 
+  ints[[i]] <- c(ints[[i]], s) # add the sampled population to the one selected from truncated weights
+  intall[[i]] <- ind[ints[[i]],] # Pulls all other data from index
+  source("areaCat.R") # save the aggregate data
+  intagg[i,] <- colSums(area.cat) 
+}
+```
+
+## The results
+
+What is the result of this?
+A list of individuals for each zone. Let's take a look at all of the model output.
+
+```{r}
+intall
+```
+
+## Rearranging the output into a single data frame
+For ease of analysis, it is best to have all the output
+individuals in a single data frame, with a new column added to show which
+zone they belong to:
+
+```{r}
+intall.df <- cbind(intall[[1]], zone = 1)
+head(intall.df)
+for(i in 2:nrow(cons)){ # run for all zones with 1:length(intall)
+  intall.df <- rbind(intall.df, cbind(intall[[i]], zone = i))
+}
+summary(intall.df[ intall.df$zone == 1, ]) # test the output
+summary(intall.df[ intall.df$zone == 3, ]) # test the output
+summary(intall.df)
+```
+
+## The impact of integerisation on model fit
+Integerisation usually introduces some error. Let's see how much:
+
+```{r}
+cor(as.numeric(as.matrix(intagg)), as.numeric(as.matrix(cons)))
+```
+
+The answer is NOT A LOT! The integerisation strategy is good at selecting
+appropriate individuals for each zone.
+
+

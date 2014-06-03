@@ -13,7 +13,7 @@ cakes <- data.frame(avCake = rep(0,nrow(cons)), sdCake = rep(0,nrow(cons)))
 
 set.seed(0) # Include this line to ensure repeatable results
 
-# Sample individuals based on their proportional probabilities
+# Sample individuals based on their weights
 for (i in 1:nrow(cons)){
   if(max(f[,i]) == 0) f[which.max(fw[,i]),i] <- 1 # ensures model will run in case max(i5.w5 < 1) thanks to Eveline van Leeuwen
   ints[[i]] <- rep(which(fw[,i] > 0), f[,i])

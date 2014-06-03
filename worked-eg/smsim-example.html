@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<!-- saved from url=(0014)about:internet -->
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=9" >
+
+<title>&#39;Spatial microsimulation&#39; in R: allocating individuals to zones</title>
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 12px;
+   margin: 8px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 { 
+   font-size:2.2em; 
+}
+
+h2 { 
+   font-size:1.8em; 
+}
+
+h3 { 
+   font-size:1.4em; 
+}
+
+h4 { 
+   font-size:1.0em; 
+}
+
+h5 { 
+   font-size:0.9em; 
+}
+
+h6 { 
+   font-size:0.8em; 
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre {	
+   margin-top: 0;
+   max-width: 95%;
+   border: 1px solid #ccc;
+   white-space: pre-wrap;
+}
+
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code.r, code.cpp {
+   background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * { 
+      background: transparent !important; 
+      color: black !important; 
+      filter:none !important; 
+      -ms-filter: none !important; 
+   }
+
+   body { 
+      font-size:12pt; 
+      max-width:100%; 
+   }
+       
+   a, a:visited { 
+      text-decoration: underline; 
+   }
+
+   hr { 
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote { 
+      padding-right: 1em; 
+      page-break-inside: avoid; 
+   }
+
+   tr, img { 
+      page-break-inside: avoid; 
+   }
+
+   img { 
+      max-width: 100% !important; 
+   }
+
+   @page :left { 
+      margin: 15mm 20mm 15mm 10mm; 
+   }
+     
+   @page :right { 
+      margin: 15mm 10mm 15mm 20mm; 
+   }
+
+   p, h2, h3 { 
+      orphans: 3; widows: 3; 
+   }
+
+   h2, h3 { 
+      page-break-after: avoid; 
+   }
+}
+
+</style>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: rgb(88, 72, 246)
+   }
+
+   pre .number {
+     color: rgb(0, 0, 205);
+   }
+
+   pre .comment {
+     color: rgb(76, 136, 107);
+   }
+
+   pre .keyword {
+     color: rgb(0, 0, 255);
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: rgb(3, 106, 7);
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+
+
+
+</head>
+
+<body>
+<h1>&#39;Spatial microsimulation&#39; in R: allocating individuals to zones</h1>
+
+<p>This reproducible code shows how to use IPF to generate lists of individuals for individual zones using IPF.
+The input datasets are 3 constraint variables and an individual level dataset.
+We will work through the entire process to show how spatial microsimulation can be done in R.</p>
+
+<h2>Loading the input data</h2>
+
+<p>The first stage is to load the input data, from an Excel spreadsheet in this case.</p>
+
+<pre><code class="r"># install.packages(&#39;gdata&#39;) # install gdata package if not already installed
+library(gdata)  # load package for reading data
+</code></pre>
+
+<pre><code>## gdata: read.xls support for &#39;XLS&#39; (Excel 97-2004) files ENABLED.
+## 
+## gdata: read.xls support for &#39;XLSX&#39; (Excel 2007+) files ENABLED.
+## 
+## Attaching package: &#39;gdata&#39;
+## 
+## The following object is masked from &#39;package:utils&#39;:
+## 
+##     object.size
+## 
+## The following object is masked from &#39;package:stats&#39;:
+## 
+##     nobs
+</code></pre>
+
+<pre><code class="r">ind &lt;- read.xls(&quot;msim.xlsx&quot;, sheet = &quot;SAMPLING&quot;)
+head(ind)
+</code></pre>
+
+<pre><code>##   ID GENDER        AGE ETHNICITY
+## 1  1   MALE  AGED0TO16     WHITE
+## 2  2   MALE  AGED0TO16     MIXED
+## 3  3   MALE  AGED0TO16     ASIAN
+## 4  4   MALE  AGED0TO16     BLACK
+## 5  5   MALE  AGED0TO16     OTHER
+## 6  6   MALE AGED17TO45     WHITE
+</code></pre>
+
+<pre><code class="r">
+# load the constraints and check the totals add up
+con1 &lt;- read.xls(&quot;msim.xlsx&quot;, &quot;GENDER&quot;)[-1]
+sum(con1)
+</code></pre>
+
+<pre><code>## [1] 840
+</code></pre>
+
+<pre><code class="r">con2 &lt;- read.xls(&quot;msim.xlsx&quot;, &quot;AGE&quot;)[-1]
+sum(con2)
+</code></pre>
+
+<pre><code>## [1] 840
+</code></pre>
+
+<pre><code class="r">con3 &lt;- read.xls(&quot;msim.xlsx&quot;, &quot;ETHNICITY&quot;)[-1]
+sum(con3)
+</code></pre>
+
+<pre><code>## [1] 840
+</code></pre>
+
+<pre><code class="r">num.cons &lt;- 3  # n. constraints - can set automatically: length(which(grepl(&#39;con[1-9]&#39;,ls()))))
+cons &lt;- cbind(con1, con2, con3)
+cat.names &lt;- names(cons)
+</code></pre>
+
+<h2>Converting the individual level data into a 0/1 &ldquo;model matrix&rdquo; for aggregation</h2>
+
+<p>In order to compare individual level data with aggregate constraints,
+the aggregate data must be converted into a flat form, with counts
+for each of the categorise in the dataset:</p>
+
+<pre><code class="r"># creating 0/1 matrix representation of ind. data
+gender.cat &lt;- model.matrix(~ind$GENDER - 1)
+age.cat &lt;- model.matrix(~ind$AGE - 1)
+eth.cat &lt;- model.matrix(~ind$ETHNICITY - 1)
+ind.cat &lt;- cbind(gender.cat, age.cat, eth.cat)
+names(ind.cat) &lt;- cat.names
+</code></pre>
+
+<h2>Create the weight matrix and initialise</h2>
+
+<p>IPF <em>reweights</em> individuals for each zone (A to C in this case).
+For this we must first create a weight matrix.
+In fact, this will be a <em>weight array</em>, with a 2D matrix for each
+constraint, allowing for easy iteration through the constraints.</p>
+
+<pre><code class="r">weights &lt;- array(dim = c(nrow(ind), nrow(cons), num.cons + 1))
+weights[, , 1] &lt;- 1  # sets initial weights to 1
+</code></pre>
+
+<h2>Create aggregated output matrix and add values from individual inputs</h2>
+
+<p>This stage creates an array for the aggregated outputs.
+Notice that <code>ind.agg</code> has the same dimension as <code>cons</code>,
+allowing for direct comparison between the two.
+This is the key to IPF!</p>
+
+<pre><code class="r">ind.agg &lt;- array(dim = c(nrow(cons), ncol(cons), num.cons + 1))
+for (i in 1:nrow(cons)) {
+    ind.agg[i, , 1] &lt;- colSums(ind.cat) * weights[1, i, 1]
+}
+ind.agg[, , 1]  # look at what we&#39;ve created - individual level data comparable w. cons
+</code></pre>
+
+<pre><code>##      [,1] [,2] [,3] [,4] [,5] [,6] [,7] [,8] [,9] [,10] [,11]
+## [1,]   20   20   10   10   10   10    8    8    8     8     8
+## [2,]   20   20   10   10   10   10    8    8    8     8     8
+## [3,]   20   20   10   10   10   10    8    8    8     8     8
+</code></pre>
+
+<h1>The IPF part</h1>
+
+<p>Now that all the data and objects used for the model have been set-up,
+we are ready to run the model. We constrain by one constraint at a time.</p>
+
+<pre><code class="r"># Re-weighting for constraint 1 via IPF
+for (j in 1:nrow(cons)) {
+    for (i in 1:ncol(con1)) {
+        weights[which(ind.cat[, i] == 1), j, 2] &lt;- con1[j, i]/ind.agg[j, i, 
+            1]
+    }
+}
+for (i in 1:nrow(cons)) {
+    # convert con1 weights back into aggregates
+    ind.agg[i, , 2] &lt;- colSums(ind.cat * weights[, i, 1] * weights[, i, 2])
+}
+# test results for first row (not necessary for model)
+ind.agg[1, , 2] - cons[1, ]  # should be zero for age/sex
+</code></pre>
+
+<pre><code>##   MALE FEMALE AGED0TO16 AGED17TO45 AGED46TO64 AGED65OLDER WHITE MIXED
+## 1    0      0      12.5      -37.5      -17.5        42.5  -150    40
+##   ASIAN BLACK OTHER
+## 1    40    30    40
+</code></pre>
+
+<pre><code class="r">cor(as.numeric(as.vector(ind.agg[, , 2])), as.numeric(as.matrix(cons)))  # how good is the correlation (fit)
+</code></pre>
+
+<pre><code>## [1] 0.5527
+</code></pre>
+
+<h2>Second constraint</h2>
+
+<pre><code class="r">for (j in 1:nrow(cons)) {
+    for (i in 1:ncol(con2) + ncol(con1)) {
+        weights[which(ind.cat[, i] == 1), j, 3] &lt;- cons[j, i]/ind.agg[j, i, 
+            2]
+    }
+}
+for (i in 1:nrow(cons)) {
+    # convert con2 back into aggregate
+    ind.agg[i, , 3] &lt;- colSums(ind.cat * weights[, i, 1] * weights[, i, 2] * 
+        weights[, i, 3])
+}
+ind.agg[1, , 3] - cons[1, ]  # should be close to zero for new constraint
+</code></pre>
+
+<pre><code>##   MALE FEMALE AGED0TO16 AGED17TO45 AGED46TO64 AGED65OLDER WHITE MIXED
+## 1    0      0         0          0          0           0  -150    40
+##   ASIAN BLACK OTHER
+## 1    40    30    40
+</code></pre>
+
+<pre><code class="r">cor(as.numeric(as.vector(ind.agg[, , 3])), as.numeric(as.matrix(cons)))  # how good is the correlation (fit)
+</code></pre>
+
+<pre><code>## [1] 0.6944
+</code></pre>
+
+<h2>Third constraint</h2>
+
+<pre><code class="r">for (j in 1:nrow(cons)) {
+    for (i in 1:ncol(con3) + ncol(con1) + ncol(con2)) {
+        weights[which(ind.cat[, i] == 1), j, 4] &lt;- cons[j, i]/ind.agg[j, i, 
+            3]
+    }
+}
+for (i in 1:nrow(cons)) {
+    # convert con3 back into aggregate
+    ind.agg[i, , 4] &lt;- colSums(ind.cat * weights[, i, 1] * weights[, i, 2] * 
+        weights[, i, 3] * weights[, i, 4])
+}
+ind.agg[1:3, , 4] - cons[1:3, ]  # test the result
+</code></pre>
+
+<pre><code>##   MALE FEMALE AGED0TO16 AGED17TO45 AGED46TO64 AGED65OLDER WHITE MIXED
+## 1    0      0         0          0          0           0     0     0
+## 2    0      0         0          0          0           0     0     0
+## 3    0      0         0          0          0           0     0     0
+##   ASIAN BLACK OTHER
+## 1     0     0     0
+## 2     0     0     0
+## 3     0     0     0
+</code></pre>
+
+<h2>Improvements in model fit</h2>
+
+<p>Notice that the fit of the model improves from one constraint to the next.
+What is the final model fit?</p>
+
+<pre><code class="r">cor(as.numeric(as.vector(ind.agg[, , 4])), as.numeric(as.matrix(cons)))  # how good is the correlation (fit)
+</code></pre>
+
+<pre><code>## [1] 1
+</code></pre>
+
+<pre><code class="r"># you get a perfect fit between constraint data and results of model why?
+# because of the final weights:
+fw &lt;- weights[, , 1] * weights[, , 2] * weights[, , 3] * weights[, , 4]
+head(fw)  # cols are zones, rows are individuals
+</code></pre>
+
+<pre><code>##      [,1]   [,2]   [,3]
+## [1,]  1.2 0.3516 0.9877
+## [2,]  1.2 1.7578 1.3169
+## [3,] 24.0 7.0312 4.9383
+## [4,]  1.2 1.7578 1.3169
+## [5,]  2.4 0.3516 0.3292
+## [6,]  2.4 1.7578 7.4074
+</code></pre>
+
+<h1>Integerisation phase</h1>
+
+<p>We have allocated weights to the individuals for a good (perfect)
+model fit. These are the <em>maximum likelihood</em> or <em>maximum entropy</em> values
+to match the individuals with the zones.
+The final stage is to convert this <em>weight matrix</em> into a list of individuals for each zone.</p>
+
+<h2>Setting up objects for the integerisation phase</h2>
+
+<pre><code class="r">intall &lt;- ints &lt;- as.list(1:nrow(cons))  # Names of integer indices (ints), and integer populations (intall) in ordered list
+intagg &lt;- cons * 0  # Aggregate area stats - set to 0 to avoid confusion
+f &lt;- floor(fw)  # truncated weights
+d &lt;- fw - f
+
+set.seed(0)  # Include this line to ensure repeatable results
+</code></pre>
+
+<h2>Integerisation loop</h2>
+
+<p>Here we sample individuals based on their weights.
+This is the Truncate Replicate Sample (TRS) method described by
+Lovelace and Ballas (2011).</p>
+
+<pre><code class="r">for (i in 1:nrow(cons)){
+  if(max(f[,i]) == 0) f[which.max(fw[,i]),i] &lt;- 1 # ensures model will run in case max(i5.w5 &lt; 1) thanks to Eveline van Leeuwen
+  ints[[i]] &lt;- rep(which(fw[,i] &gt; 0), f[,i])
+  s &lt;- sample(which(fw[,i] &gt; 0), size = sum(con1[i,]) - sum(f[,i]) , # sample using decimal weights to &#39;top up&#39; selection
+              prob=d[,i], replace = F) 
+  ints[[i]] &lt;- c(ints[[i]], s) # add the sampled population to the one selected from truncated weights
+  intall[[i]] &lt;- ind[ints[[i]],] # Pulls all other data from index
+  source(&quot;areaCat.R&quot;) # save the aggregate data
+  intagg[i,] &lt;- colSums(area.cat) 
+}
+</code></pre>
+
+<h2>The results</h2>
+
+<p>What is the result of this?
+A list of individuals for each zone. Let&#39;s take a look at all of the model output.</p>
+
+<pre><code class="r">intall
+</code></pre>
+
+<pre><code>## [[1]]
+##       ID GENDER         AGE ETHNICITY
+## 1      1   MALE   AGED0TO16     WHITE
+## 2      2   MALE   AGED0TO16     MIXED
+## 3      3   MALE   AGED0TO16     ASIAN
+## 3.1    3   MALE   AGED0TO16     ASIAN
+## 3.2    3   MALE   AGED0TO16     ASIAN
+## 3.3    3   MALE   AGED0TO16     ASIAN
+## 3.4    3   MALE   AGED0TO16     ASIAN
+## 3.5    3   MALE   AGED0TO16     ASIAN
+## 3.6    3   MALE   AGED0TO16     ASIAN
+## 3.7    3   MALE   AGED0TO16     ASIAN
+## 3.8    3   MALE   AGED0TO16     ASIAN
+## 3.9    3   MALE   AGED0TO16     ASIAN
+## 3.10   3   MALE   AGED0TO16     ASIAN
+## 3.11   3   MALE   AGED0TO16     ASIAN
+## 3.12   3   MALE   AGED0TO16     ASIAN
+## 3.13   3   MALE   AGED0TO16     ASIAN
+## 3.14   3   MALE   AGED0TO16     ASIAN
+## 3.15   3   MALE   AGED0TO16     ASIAN
+## 3.16   3   MALE   AGED0TO16     ASIAN
+## 3.17   3   MALE   AGED0TO16     ASIAN
+## 3.18   3   MALE   AGED0TO16     ASIAN
+## 3.19   3   MALE   AGED0TO16     ASIAN
+## 3.20   3   MALE   AGED0TO16     ASIAN
+## 3.21   3   MALE   AGED0TO16     ASIAN
+## 3.22   3   MALE   AGED0TO16     ASIAN
+## 3.23   3   MALE   AGED0TO16     ASIAN
+## 4      4   MALE   AGED0TO16     BLACK
+## 5      5   MALE   AGED0TO16     OTHER
+## 5.1    5   MALE   AGED0TO16     OTHER
+## 6      6   MALE  AGED17TO45     WHITE
+## 6.1    6   MALE  AGED17TO45     WHITE
+## 7      7   MALE  AGED17TO45     MIXED
+## 7.1    7   MALE  AGED17TO45     MIXED
+## 8      8   MALE  AGED17TO45     ASIAN
+## 8.1    8   MALE  AGED17TO45     ASIAN
+## 8.2    8   MALE  AGED17TO45     ASIAN
+## 8.3    8   MALE  AGED17TO45     ASIAN
+## 8.4    8   MALE  AGED17TO45     ASIAN
+## 8.5    8   MALE  AGED17TO45     ASIAN
+## 8.6    8   MALE  AGED17TO45     ASIAN
+## 8.7    8   MALE  AGED17TO45     ASIAN
+## 8.8    8   MALE  AGED17TO45     ASIAN
+## 8.9    8   MALE  AGED17TO45     ASIAN
+## 8.10   8   MALE  AGED17TO45     ASIAN
+## 8.11   8   MALE  AGED17TO45     ASIAN
+## 8.12   8   MALE  AGED17TO45     ASIAN
+## 8.13   8   MALE  AGED17TO45     ASIAN
+## 8.14   8   MALE  AGED17TO45     ASIAN
+## 8.15   8   MALE  AGED17TO45     ASIAN
+## 8.16   8   MALE  AGED17TO45     ASIAN
+## 8.17   8   MALE  AGED17TO45     ASIAN
+## 8.18   8   MALE  AGED17TO45     ASIAN
+## 8.19   8   MALE  AGED17TO45     ASIAN
+## 8.20   8   MALE  AGED17TO45     ASIAN
+## 8.21   8   MALE  AGED17TO45     ASIAN
+## 8.22   8   MALE  AGED17TO45     ASIAN
+## 8.23   8   MALE  AGED17TO45     ASIAN
+## 8.24   8   MALE  AGED17TO45     ASIAN
+## 8.25   8   MALE  AGED17TO45     ASIAN
+## 8.26   8   MALE  AGED17TO45     ASIAN
+## 8.27   8   MALE  AGED17TO45     ASIAN
+## 8.28   8   MALE  AGED17TO45     ASIAN
+## 8.29   8   MALE  AGED17TO45     ASIAN
+## 8.30   8   MALE  AGED17TO45     ASIAN
+## 8.31   8   MALE  AGED17TO45     ASIAN
+## 8.32   8   MALE  AGED17TO45     ASIAN
+## 8.33   8   MALE  AGED17TO45     ASIAN
+## 8.34   8   MALE  AGED17TO45     ASIAN
+## 8.35   8   MALE  AGED17TO45     ASIAN
+## 8.36   8   MALE  AGED17TO45     ASIAN
+## 8.37   8   MALE  AGED17TO45     ASIAN
+## 8.38   8   MALE  AGED17TO45     ASIAN
+## 8.39   8   MALE  AGED17TO45     ASIAN
+## 8.40   8   MALE  AGED17TO45     ASIAN
+## 8.41   8   MALE  AGED17TO45     ASIAN
+## 8.42   8   MALE  AGED17TO45     ASIAN
+## 8.43   8   MALE  AGED17TO45     ASIAN
+## 8.44   8   MALE  AGED17TO45     ASIAN
+## 8.45   8   MALE  AGED17TO45     ASIAN
+## 8.46   8   MALE  AGED17TO45     ASIAN
+## 8.47   8   MALE  AGED17TO45     ASIAN
+## 9      9   MALE  AGED17TO45     BLACK
+## 9.1    9   MALE  AGED17TO45     BLACK
+## 10    10   MALE  AGED17TO45     OTHER
+## 10.1  10   MALE  AGED17TO45     OTHER
+## 10.2  10   MALE  AGED17TO45     OTHER
+## 10.3  10   MALE  AGED17TO45     OTHER
+## 11    11   MALE  AGED46TO64     WHITE
+## 12    12   MALE  AGED46TO64     MIXED
+## 13    13   MALE  AGED46TO64     ASIAN
+## 13.1  13   MALE  AGED46TO64     ASIAN
+## 13.2  13   MALE  AGED46TO64     ASIAN
+## 13.3  13   MALE  AGED46TO64     ASIAN
+## 13.4  13   MALE  AGED46TO64     ASIAN
+## 13.5  13   MALE  AGED46TO64     ASIAN
+## 13.6  13   MALE  AGED46TO64     ASIAN
+## 13.7  13   MALE  AGED46TO64     ASIAN
+## 13.8  13   MALE  AGED46TO64     ASIAN
+## 13.9  13   MALE  AGED46TO64     ASIAN
+## 13.10 13   MALE  AGED46TO64     ASIAN
+## 13.11 13   MALE  AGED46TO64     ASIAN
+## 13.12 13   MALE  AGED46TO64     ASIAN
+## 13.13 13   MALE  AGED46TO64     ASIAN
+## 13.14 13   MALE  AGED46TO64     ASIAN
+## 13.15 13   MALE  AGED46TO64     ASIAN
+## 13.16 13   MALE  AGED46TO64     ASIAN
+## 13.17 13   MALE  AGED46TO64     ASIAN
+## 13.18 13   MALE  AGED46TO64     ASIAN
+## 13.19 13   MALE  AGED46TO64     ASIAN
+## 13.20 13   MALE  AGED46TO64     ASIAN
+## 13.21 13   MALE  AGED46TO64     ASIAN
+## 13.22 13   MALE  AGED46TO64     ASIAN
+## 13.23 13   MALE  AGED46TO64     ASIAN
+## 13.24 13   MALE  AGED46TO64     ASIAN
+## 13.25 13   MALE  AGED46TO64     ASIAN
+## 13.26 13   MALE  AGED46TO64     ASIAN
+## 13.27 13   MALE  AGED46TO64     ASIAN
+## 13.28 13   MALE  AGED46TO64     ASIAN
+## 13.29 13   MALE  AGED46TO64     ASIAN
+## 13.30 13   MALE  AGED46TO64     ASIAN
+## 13.31 13   MALE  AGED46TO64     ASIAN
+## 13.32 13   MALE  AGED46TO64     ASIAN
+## 13.33 13   MALE  AGED46TO64     ASIAN
+## 13.34 13   MALE  AGED46TO64     ASIAN
+## 13.35 13   MALE  AGED46TO64     ASIAN
+## 13.36 13   MALE  AGED46TO64     ASIAN
+## 13.37 13   MALE  AGED46TO64     ASIAN
+## 14    14   MALE  AGED46TO64     BLACK
+## 15    15   MALE  AGED46TO64     OTHER
+## 15.1  15   MALE  AGED46TO64     OTHER
+## 15.2  15   MALE  AGED46TO64     OTHER
+## 18    18   MALE AGED65OLDER     ASIAN
+## 18.1  18   MALE AGED65OLDER     ASIAN
+## 18.2  18   MALE AGED65OLDER     ASIAN
+## 18.3  18   MALE AGED65OLDER     ASIAN
+## 18.4  18   MALE AGED65OLDER     ASIAN
+## 18.5  18   MALE AGED65OLDER     ASIAN
+## 18.6  18   MALE AGED65OLDER     ASIAN
+## 18.7  18   MALE AGED65OLDER     ASIAN
+## 18.8  18   MALE AGED65OLDER     ASIAN
+## 23    23 FEMALE   AGED0TO16     ASIAN
+## 23.1  23 FEMALE   AGED0TO16     ASIAN
+## 23.2  23 FEMALE   AGED0TO16     ASIAN
+## 23.3  23 FEMALE   AGED0TO16     ASIAN
+## 23.4  23 FEMALE   AGED0TO16     ASIAN
+## 23.5  23 FEMALE   AGED0TO16     ASIAN
+## 23.6  23 FEMALE   AGED0TO16     ASIAN
+## 23.7  23 FEMALE   AGED0TO16     ASIAN
+## 23.8  23 FEMALE   AGED0TO16     ASIAN
+## 23.9  23 FEMALE   AGED0TO16     ASIAN
+## 23.10 23 FEMALE   AGED0TO16     ASIAN
+## 23.11 23 FEMALE   AGED0TO16     ASIAN
+## 23.12 23 FEMALE   AGED0TO16     ASIAN
+## 23.13 23 FEMALE   AGED0TO16     ASIAN
+## 23.14 23 FEMALE   AGED0TO16     ASIAN
+## 23.15 23 FEMALE   AGED0TO16     ASIAN
+## 25    25 FEMALE   AGED0TO16     OTHER
+## 26    26 FEMALE  AGED17TO45     WHITE
+## 27    27 FEMALE  AGED17TO45     MIXED
+## 28    28 FEMALE  AGED17TO45     ASIAN
+## 28.1  28 FEMALE  AGED17TO45     ASIAN
+## 28.2  28 FEMALE  AGED17TO45     ASIAN
+## 28.3  28 FEMALE  AGED17TO45     ASIAN
+## 28.4  28 FEMALE  AGED17TO45     ASIAN
+## 28.5  28 FEMALE  AGED17TO45     ASIAN
+## 28.6  28 FEMALE  AGED17TO45     ASIAN
+## 28.7  28 FEMALE  AGED17TO45     ASIAN
+## 28.8  28 FEMALE  AGED17TO45     ASIAN
+## 28.9  28 FEMALE  AGED17TO45     ASIAN
+## 28.10 28 FEMALE  AGED17TO45     ASIAN
+## 28.11 28 FEMALE  AGED17TO45     ASIAN
+## 28.12 28 FEMALE  AGED17TO45     ASIAN
+## 28.13 28 FEMALE  AGED17TO45     ASIAN
+## 28.14 28 FEMALE  AGED17TO45     ASIAN
+## 28.15 28 FEMALE  AGED17TO45     ASIAN
+## 28.16 28 FEMALE  AGED17TO45     ASIAN
+## 28.17 28 FEMALE  AGED17TO45     ASIAN
+## 28.18 28 FEMALE  AGED17TO45     ASIAN
+## 28.19 28 FEMALE  AGED17TO45     ASIAN
+## 28.20 28 FEMALE  AGED17TO45     ASIAN
+## 28.21 28 FEMALE  AGED17TO45     ASIAN
+## 28.22 28 FEMALE  AGED17TO45     ASIAN
+## 28.23 28 FEMALE  AGED17TO45     ASIAN
+## 28.24 28 FEMALE  AGED17TO45     ASIAN
+## 28.25 28 FEMALE  AGED17TO45     ASIAN
+## 28.26 28 FEMALE  AGED17TO45     ASIAN
+## 28.27 28 FEMALE  AGED17TO45     ASIAN
+## 28.28 28 FEMALE  AGED17TO45     ASIAN
+## 28.29 28 FEMALE  AGED17TO45     ASIAN
+## 28.30 28 FEMALE  AGED17TO45     ASIAN
+## 28.31 28 FEMALE  AGED17TO45     ASIAN
+## 29    29 FEMALE  AGED17TO45     BLACK
+## 30    30 FEMALE  AGED17TO45     OTHER
+## 30.1  30 FEMALE  AGED17TO45     OTHER
+## 30.2  30 FEMALE  AGED17TO45     OTHER
+## 31    31 FEMALE  AGED46TO64     WHITE
+## 32    32 FEMALE  AGED46TO64     MIXED
+## 33    33 FEMALE  AGED46TO64     ASIAN
+## 33.1  33 FEMALE  AGED46TO64     ASIAN
+## 33.2  33 FEMALE  AGED46TO64     ASIAN
+## 33.3  33 FEMALE  AGED46TO64     ASIAN
+## 33.4  33 FEMALE  AGED46TO64     ASIAN
+## 33.5  33 FEMALE  AGED46TO64     ASIAN
+## 33.6  33 FEMALE  AGED46TO64     ASIAN
+## 33.7  33 FEMALE  AGED46TO64     ASIAN
+## 33.8  33 FEMALE  AGED46TO64     ASIAN
+## 33.9  33 FEMALE  AGED46TO64     ASIAN
+## 33.10 33 FEMALE  AGED46TO64     ASIAN
+## 33.11 33 FEMALE  AGED46TO64     ASIAN
+## 33.12 33 FEMALE  AGED46TO64     ASIAN
+## 33.13 33 FEMALE  AGED46TO64     ASIAN
+## 33.14 33 FEMALE  AGED46TO64     ASIAN
+## 33.15 33 FEMALE  AGED46TO64     ASIAN
+## 33.16 33 FEMALE  AGED46TO64     ASIAN
+## 33.17 33 FEMALE  AGED46TO64     ASIAN
+## 33.18 33 FEMALE  AGED46TO64     ASIAN
+## 33.19 33 FEMALE  AGED46TO64     ASIAN
+## 33.20 33 FEMALE  AGED46TO64     ASIAN
+## 33.21 33 FEMALE  AGED46TO64     ASIAN
+## 33.22 33 FEMALE  AGED46TO64     ASIAN
+## 33.23 33 FEMALE  AGED46TO64     ASIAN
+## 33.24 33 FEMALE  AGED46TO64     ASIAN
+## 34    34 FEMALE  AGED46TO64     BLACK
+## 35    35 FEMALE  AGED46TO64     OTHER
+## 35.1  35 FEMALE  AGED46TO64     OTHER
+## 38    38 FEMALE AGED65OLDER     ASIAN
+## 38.1  38 FEMALE AGED65OLDER     ASIAN
+## 38.2  38 FEMALE AGED65OLDER     ASIAN
+## 38.3  38 FEMALE AGED65OLDER     ASIAN
+## 38.4  38 FEMALE AGED65OLDER     ASIAN
+## 38.5  38 FEMALE AGED65OLDER     ASIAN
+## 37    37 FEMALE AGED65OLDER     MIXED
+## 10.4  10   MALE  AGED17TO45     OTHER
+## 21    21 FEMALE   AGED0TO16     WHITE
+## 29.1  29 FEMALE  AGED17TO45     BLACK
+## 31.1  31 FEMALE  AGED46TO64     WHITE
+## 12.1  12   MALE  AGED46TO64     MIXED
+## 36    36 FEMALE AGED65OLDER     WHITE
+## 32.1  32 FEMALE  AGED46TO64     MIXED
+## 19    19   MALE AGED65OLDER     BLACK
+## 35.2  35 FEMALE  AGED46TO64     OTHER
+## 20    20   MALE AGED65OLDER     OTHER
+## 15.3  15   MALE  AGED46TO64     OTHER
+## 24    24 FEMALE   AGED0TO16     BLACK
+## 38.6  38 FEMALE AGED65OLDER     ASIAN
+## 27.1  27 FEMALE  AGED17TO45     MIXED
+## 5.2    5   MALE   AGED0TO16     OTHER
+## 26.1  26 FEMALE  AGED17TO45     WHITE
+## 6.2    6   MALE  AGED17TO45     WHITE
+## 2.1    2   MALE   AGED0TO16     MIXED
+## 
+## [[2]]
+##       ID GENDER         AGE ETHNICITY
+## 2      2   MALE   AGED0TO16     MIXED
+## 3      3   MALE   AGED0TO16     ASIAN
+## 3.1    3   MALE   AGED0TO16     ASIAN
+## 3.2    3   MALE   AGED0TO16     ASIAN
+## 3.3    3   MALE   AGED0TO16     ASIAN
+## 3.4    3   MALE   AGED0TO16     ASIAN
+## 3.5    3   MALE   AGED0TO16     ASIAN
+## 3.6    3   MALE   AGED0TO16     ASIAN
+## 4      4   MALE   AGED0TO16     BLACK
+## 6      6   MALE  AGED17TO45     WHITE
+## 7      7   MALE  AGED17TO45     MIXED
+## 7.1    7   MALE  AGED17TO45     MIXED
+## 7.2    7   MALE  AGED17TO45     MIXED
+## 7.3    7   MALE  AGED17TO45     MIXED
+## 7.4    7   MALE  AGED17TO45     MIXED
+## 7.5    7   MALE  AGED17TO45     MIXED
+## 7.6    7   MALE  AGED17TO45     MIXED
+## 7.7    7   MALE  AGED17TO45     MIXED
+## 8      8   MALE  AGED17TO45     ASIAN
+## 8.1    8   MALE  AGED17TO45     ASIAN
+## 8.2    8   MALE  AGED17TO45     ASIAN
+## 8.3    8   MALE  AGED17TO45     ASIAN
+## 8.4    8   MALE  AGED17TO45     ASIAN
+## 8.5    8   MALE  AGED17TO45     ASIAN
+## 8.6    8   MALE  AGED17TO45     ASIAN
+## 8.7    8   MALE  AGED17TO45     ASIAN
+## 8.8    8   MALE  AGED17TO45     ASIAN
+## 8.9    8   MALE  AGED17TO45     ASIAN
+## 8.10   8   MALE  AGED17TO45     ASIAN
+## 8.11   8   MALE  AGED17TO45     ASIAN
+## 8.12   8   MALE  AGED17TO45     ASIAN
+## 8.13   8   MALE  AGED17TO45     ASIAN
+## 8.14   8   MALE  AGED17TO45     ASIAN
+## 8.15   8   MALE  AGED17TO45     ASIAN
+## 8.16   8   MALE  AGED17TO45     ASIAN
+## 8.17   8   MALE  AGED17TO45     ASIAN
+## 8.18   8   MALE  AGED17TO45     ASIAN
+## 8.19   8   MALE  AGED17TO45     ASIAN
+## 8.20   8   MALE  AGED17TO45     ASIAN
+## 8.21   8   MALE  AGED17TO45     ASIAN
+## 8.22   8   MALE  AGED17TO45     ASIAN
+## 8.23   8   MALE  AGED17TO45     ASIAN
+## 8.24   8   MALE  AGED17TO45     ASIAN
+## 8.25   8   MALE  AGED17TO45     ASIAN
+## 8.26   8   MALE  AGED17TO45     ASIAN
+## 8.27   8   MALE  AGED17TO45     ASIAN
+## 8.28   8   MALE  AGED17TO45     ASIAN
+## 8.29   8   MALE  AGED17TO45     ASIAN
+## 8.30   8   MALE  AGED17TO45     ASIAN
+## 8.31   8   MALE  AGED17TO45     ASIAN
+## 8.32   8   MALE  AGED17TO45     ASIAN
+## 8.33   8   MALE  AGED17TO45     ASIAN
+## 8.34   8   MALE  AGED17TO45     ASIAN
+## 9      9   MALE  AGED17TO45     BLACK
+## 9.1    9   MALE  AGED17TO45     BLACK
+## 9.2    9   MALE  AGED17TO45     BLACK
+## 9.3    9   MALE  AGED17TO45     BLACK
+## 9.4    9   MALE  AGED17TO45     BLACK
+## 9.5    9   MALE  AGED17TO45     BLACK
+## 9.6    9   MALE  AGED17TO45     BLACK
+## 9.7    9   MALE  AGED17TO45     BLACK
+## 10    10   MALE  AGED17TO45     OTHER
+## 11    11   MALE  AGED46TO64     WHITE
+## 12    12   MALE  AGED46TO64     MIXED
+## 12.1  12   MALE  AGED46TO64     MIXED
+## 12.2  12   MALE  AGED46TO64     MIXED
+## 12.3  12   MALE  AGED46TO64     MIXED
+## 12.4  12   MALE  AGED46TO64     MIXED
+## 13    13   MALE  AGED46TO64     ASIAN
+## 13.1  13   MALE  AGED46TO64     ASIAN
+## 13.2  13   MALE  AGED46TO64     ASIAN
+## 13.3  13   MALE  AGED46TO64     ASIAN
+## 13.4  13   MALE  AGED46TO64     ASIAN
+## 13.5  13   MALE  AGED46TO64     ASIAN
+## 13.6  13   MALE  AGED46TO64     ASIAN
+## 13.7  13   MALE  AGED46TO64     ASIAN
+## 13.8  13   MALE  AGED46TO64     ASIAN
+## 13.9  13   MALE  AGED46TO64     ASIAN
+## 13.10 13   MALE  AGED46TO64     ASIAN
+## 13.11 13   MALE  AGED46TO64     ASIAN
+## 13.12 13   MALE  AGED46TO64     ASIAN
+## 13.13 13   MALE  AGED46TO64     ASIAN
+## 13.14 13   MALE  AGED46TO64     ASIAN
+## 13.15 13   MALE  AGED46TO64     ASIAN
+## 13.16 13   MALE  AGED46TO64     ASIAN
+## 13.17 13   MALE  AGED46TO64     ASIAN
+## 13.18 13   MALE  AGED46TO64     ASIAN
+## 13.19 13   MALE  AGED46TO64     ASIAN
+## 13.20 13   MALE  AGED46TO64     ASIAN
+## 13.21 13   MALE  AGED46TO64     ASIAN
+## 14    14   MALE  AGED46TO64     BLACK
+## 14.1  14   MALE  AGED46TO64     BLACK
+## 14.2  14   MALE  AGED46TO64     BLACK
+## 14.3  14   MALE  AGED46TO64     BLACK
+## 14.4  14   MALE  AGED46TO64     BLACK
+## 15    15   MALE  AGED46TO64     OTHER
+## 17    17   MALE AGED65OLDER     MIXED
+## 17.1  17   MALE AGED65OLDER     MIXED
+## 18    18   MALE AGED65OLDER     ASIAN
+## 18.1  18   MALE AGED65OLDER     ASIAN
+## 18.2  18   MALE AGED65OLDER     ASIAN
+## 18.3  18   MALE AGED65OLDER     ASIAN
+## 18.4  18   MALE AGED65OLDER     ASIAN
+## 18.5  18   MALE AGED65OLDER     ASIAN
+## 18.6  18   MALE AGED65OLDER     ASIAN
+## 18.7  18   MALE AGED65OLDER     ASIAN
+## 18.8  18   MALE AGED65OLDER     ASIAN
+## 18.9  18   MALE AGED65OLDER     ASIAN
+## 19    19   MALE AGED65OLDER     BLACK
+## 19.1  19   MALE AGED65OLDER     BLACK
+## 22    22 FEMALE   AGED0TO16     MIXED
+## 22.1  22 FEMALE   AGED0TO16     MIXED
+## 23    23 FEMALE   AGED0TO16     ASIAN
+## 23.1  23 FEMALE   AGED0TO16     ASIAN
+## 23.2  23 FEMALE   AGED0TO16     ASIAN
+## 23.3  23 FEMALE   AGED0TO16     ASIAN
+## 23.4  23 FEMALE   AGED0TO16     ASIAN
+## 23.5  23 FEMALE   AGED0TO16     ASIAN
+## 23.6  23 FEMALE   AGED0TO16     ASIAN
+## 23.7  23 FEMALE   AGED0TO16     ASIAN
+## 23.8  23 FEMALE   AGED0TO16     ASIAN
+## 23.9  23 FEMALE   AGED0TO16     ASIAN
+## 23.10 23 FEMALE   AGED0TO16     ASIAN
+## 24    24 FEMALE   AGED0TO16     BLACK
+## 24.1  24 FEMALE   AGED0TO16     BLACK
+## 26    26 FEMALE  AGED17TO45     WHITE
+## 26.1  26 FEMALE  AGED17TO45     WHITE
+## 27    27 FEMALE  AGED17TO45     MIXED
+## 27.1  27 FEMALE  AGED17TO45     MIXED
+## 27.2  27 FEMALE  AGED17TO45     MIXED
+## 27.3  27 FEMALE  AGED17TO45     MIXED
+## 27.4  27 FEMALE  AGED17TO45     MIXED
+## 27.5  27 FEMALE  AGED17TO45     MIXED
+## 27.6  27 FEMALE  AGED17TO45     MIXED
+## 27.7  27 FEMALE  AGED17TO45     MIXED
+## 27.8  27 FEMALE  AGED17TO45     MIXED
+## 27.9  27 FEMALE  AGED17TO45     MIXED
+## 27.10 27 FEMALE  AGED17TO45     MIXED
+## 27.11 27 FEMALE  AGED17TO45     MIXED
+## 27.12 27 FEMALE  AGED17TO45     MIXED
+## 27.13 27 FEMALE  AGED17TO45     MIXED
+## 28    28 FEMALE  AGED17TO45     ASIAN
+## 28.1  28 FEMALE  AGED17TO45     ASIAN
+## 28.2  28 FEMALE  AGED17TO45     ASIAN
+## 28.3  28 FEMALE  AGED17TO45     ASIAN
+## 28.4  28 FEMALE  AGED17TO45     ASIAN
+## 28.5  28 FEMALE  AGED17TO45     ASIAN
+## 28.6  28 FEMALE  AGED17TO45     ASIAN
+## 28.7  28 FEMALE  AGED17TO45     ASIAN
+## 28.8  28 FEMALE  AGED17TO45     ASIAN
+## 28.9  28 FEMALE  AGED17TO45     ASIAN
+## 28.10 28 FEMALE  AGED17TO45     ASIAN
+## 28.11 28 FEMALE  AGED17TO45     ASIAN
+## 28.12 28 FEMALE  AGED17TO45     ASIAN
+## 28.13 28 FEMALE  AGED17TO45     ASIAN
+## 28.14 28 FEMALE  AGED17TO45     ASIAN
+## 28.15 28 FEMALE  AGED17TO45     ASIAN
+## 28.16 28 FEMALE  AGED17TO45     ASIAN
+## 28.17 28 FEMALE  AGED17TO45     ASIAN
+## 28.18 28 FEMALE  AGED17TO45     ASIAN
+## 28.19 28 FEMALE  AGED17TO45     ASIAN
+## 28.20 28 FEMALE  AGED17TO45     ASIAN
+## 28.21 28 FEMALE  AGED17TO45     ASIAN
+## 28.22 28 FEMALE  AGED17TO45     ASIAN
+## 28.23 28 FEMALE  AGED17TO45     ASIAN
+## 28.24 28 FEMALE  AGED17TO45     ASIAN
+## 28.25 28 FEMALE  AGED17TO45     ASIAN
+## 28.26 28 FEMALE  AGED17TO45     ASIAN
+## 28.27 28 FEMALE  AGED17TO45     ASIAN
+## 28.28 28 FEMALE  AGED17TO45     ASIAN
+## 28.29 28 FEMALE  AGED17TO45     ASIAN
+## 28.30 28 FEMALE  AGED17TO45     ASIAN
+## 28.31 28 FEMALE  AGED17TO45     ASIAN
+## 28.32 28 FEMALE  AGED17TO45     ASIAN
+## 28.33 28 FEMALE  AGED17TO45     ASIAN
+## 28.34 28 FEMALE  AGED17TO45     ASIAN
+## 28.35 28 FEMALE  AGED17TO45     ASIAN
+## 28.36 28 FEMALE  AGED17TO45     ASIAN
+## 28.37 28 FEMALE  AGED17TO45     ASIAN
+## 28.38 28 FEMALE  AGED17TO45     ASIAN
+## 28.39 28 FEMALE  AGED17TO45     ASIAN
+## 28.40 28 FEMALE  AGED17TO45     ASIAN
+## 28.41 28 FEMALE  AGED17TO45     ASIAN
+## 28.42 28 FEMALE  AGED17TO45     ASIAN
+## 28.43 28 FEMALE  AGED17TO45     ASIAN
+## 28.44 28 FEMALE  AGED17TO45     ASIAN
+## 28.45 28 FEMALE  AGED17TO45     ASIAN
+## 28.46 28 FEMALE  AGED17TO45     ASIAN
+## 28.47 28 FEMALE  AGED17TO45     ASIAN
+## 28.48 28 FEMALE  AGED17TO45     ASIAN
+## 28.49 28 FEMALE  AGED17TO45     ASIAN
+## 28.50 28 FEMALE  AGED17TO45     ASIAN
+## 28.51 28 FEMALE  AGED17TO45     ASIAN
+## 28.52 28 FEMALE  AGED17TO45     ASIAN
+## 28.53 28 FEMALE  AGED17TO45     ASIAN
+## 28.54 28 FEMALE  AGED17TO45     ASIAN
+## 28.55 28 FEMALE  AGED17TO45     ASIAN
+## 28.56 28 FEMALE  AGED17TO45     ASIAN
+## 28.57 28 FEMALE  AGED17TO45     ASIAN
+## 29    29 FEMALE  AGED17TO45     BLACK
+## 29.1  29 FEMALE  AGED17TO45     BLACK
+## 29.2  29 FEMALE  AGED17TO45     BLACK
+## 29.3  29 FEMALE  AGED17TO45     BLACK
+## 29.4  29 FEMALE  AGED17TO45     BLACK
+## 29.5  29 FEMALE  AGED17TO45     BLACK
+## 29.6  29 FEMALE  AGED17TO45     BLACK
+## 29.7  29 FEMALE  AGED17TO45     BLACK
+## 29.8  29 FEMALE  AGED17TO45     BLACK
+## 29.9  29 FEMALE  AGED17TO45     BLACK
+## 29.10 29 FEMALE  AGED17TO45     BLACK
+## 29.11 29 FEMALE  AGED17TO45     BLACK
+## 29.12 29 FEMALE  AGED17TO45     BLACK
+## 29.13 29 FEMALE  AGED17TO45     BLACK
+## 30    30 FEMALE  AGED17TO45     OTHER
+## 30.1  30 FEMALE  AGED17TO45     OTHER
+## 31    31 FEMALE  AGED46TO64     WHITE
+## 32    32 FEMALE  AGED46TO64     MIXED
+## 32.1  32 FEMALE  AGED46TO64     MIXED
+## 32.2  32 FEMALE  AGED46TO64     MIXED
+## 32.3  32 FEMALE  AGED46TO64     MIXED
+## 32.4  32 FEMALE  AGED46TO64     MIXED
+## 32.5  32 FEMALE  AGED46TO64     MIXED
+## 32.6  32 FEMALE  AGED46TO64     MIXED
+## 32.7  32 FEMALE  AGED46TO64     MIXED
+## 32.8  32 FEMALE  AGED46TO64     MIXED
+## 33    33 FEMALE  AGED46TO64     ASIAN
+## 33.1  33 FEMALE  AGED46TO64     ASIAN
+## 33.2  33 FEMALE  AGED46TO64     ASIAN
+## 33.3  33 FEMALE  AGED46TO64     ASIAN
+## 33.4  33 FEMALE  AGED46TO64     ASIAN
+## 33.5  33 FEMALE  AGED46TO64     ASIAN
+## 33.6  33 FEMALE  AGED46TO64     ASIAN
+## 33.7  33 FEMALE  AGED46TO64     ASIAN
+## 33.8  33 FEMALE  AGED46TO64     ASIAN
+## 33.9  33 FEMALE  AGED46TO64     ASIAN
+## 33.10 33 FEMALE  AGED46TO64     ASIAN
+## 33.11 33 FEMALE  AGED46TO64     ASIAN
+## 33.12 33 FEMALE  AGED46TO64     ASIAN
+## 33.13 33 FEMALE  AGED46TO64     ASIAN
+## 33.14 33 FEMALE  AGED46TO64     ASIAN
+## 33.15 33 FEMALE  AGED46TO64     ASIAN
+## 33.16 33 FEMALE  AGED46TO64     ASIAN
+## 33.17 33 FEMALE  AGED46TO64     ASIAN
+## 33.18 33 FEMALE  AGED46TO64     ASIAN
+## 33.19 33 FEMALE  AGED46TO64     ASIAN
+## 33.20 33 FEMALE  AGED46TO64     ASIAN
+## 33.21 33 FEMALE  AGED46TO64     ASIAN
+## 33.22 33 FEMALE  AGED46TO64     ASIAN
+## 33.23 33 FEMALE  AGED46TO64     ASIAN
+## 33.24 33 FEMALE  AGED46TO64     ASIAN
+## 33.25 33 FEMALE  AGED46TO64     ASIAN
+## 33.26 33 FEMALE  AGED46TO64     ASIAN
+## 33.27 33 FEMALE  AGED46TO64     ASIAN
+## 33.28 33 FEMALE  AGED46TO64     ASIAN
+## 33.29 33 FEMALE  AGED46TO64     ASIAN
+## 33.30 33 FEMALE  AGED46TO64     ASIAN
+## 33.31 33 FEMALE  AGED46TO64     ASIAN
+## 33.32 33 FEMALE  AGED46TO64     ASIAN
+## 33.33 33 FEMALE  AGED46TO64     ASIAN
+## 33.34 33 FEMALE  AGED46TO64     ASIAN
+## 33.35 33 FEMALE  AGED46TO64     ASIAN
+## 33.36 33 FEMALE  AGED46TO64     ASIAN
+## 34    34 FEMALE  AGED46TO64     BLACK
+## 34.1  34 FEMALE  AGED46TO64     BLACK
+## 34.2  34 FEMALE  AGED46TO64     BLACK
+## 34.3  34 FEMALE  AGED46TO64     BLACK
+## 34.4  34 FEMALE  AGED46TO64     BLACK
+## 34.5  34 FEMALE  AGED46TO64     BLACK
+## 34.6  34 FEMALE  AGED46TO64     BLACK
+## 34.7  34 FEMALE  AGED46TO64     BLACK
+## 34.8  34 FEMALE  AGED46TO64     BLACK
+## 35    35 FEMALE  AGED46TO64     OTHER
+## 37    37 FEMALE AGED65OLDER     MIXED
+## 37.1  37 FEMALE AGED65OLDER     MIXED
+## 37.2  37 FEMALE AGED65OLDER     MIXED
+## 37.3  37 FEMALE AGED65OLDER     MIXED
+## 38    38 FEMALE AGED65OLDER     ASIAN
+## 38.1  38 FEMALE AGED65OLDER     ASIAN
+## 38.2  38 FEMALE AGED65OLDER     ASIAN
+## 38.3  38 FEMALE AGED65OLDER     ASIAN
+## 38.4  38 FEMALE AGED65OLDER     ASIAN
+## 38.5  38 FEMALE AGED65OLDER     ASIAN
+## 38.6  38 FEMALE AGED65OLDER     ASIAN
+## 38.7  38 FEMALE AGED65OLDER     ASIAN
+## 38.8  38 FEMALE AGED65OLDER     ASIAN
+## 38.9  38 FEMALE AGED65OLDER     ASIAN
+## 38.10 38 FEMALE AGED65OLDER     ASIAN
+## 38.11 38 FEMALE AGED65OLDER     ASIAN
+## 38.12 38 FEMALE AGED65OLDER     ASIAN
+## 38.13 38 FEMALE AGED65OLDER     ASIAN
+## 38.14 38 FEMALE AGED65OLDER     ASIAN
+## 38.15 38 FEMALE AGED65OLDER     ASIAN
+## 38.16 38 FEMALE AGED65OLDER     ASIAN
+## 39    39 FEMALE AGED65OLDER     BLACK
+## 39.1  39 FEMALE AGED65OLDER     BLACK
+## 39.2  39 FEMALE AGED65OLDER     BLACK
+## 39.3  39 FEMALE AGED65OLDER     BLACK
+## 9.8    9   MALE  AGED17TO45     BLACK
+## 12.5  12   MALE  AGED46TO64     MIXED
+## 5      5   MALE   AGED0TO16     OTHER
+## 40    40 FEMALE AGED65OLDER     OTHER
+## 19.2  19   MALE AGED65OLDER     BLACK
+## 22.2  22 FEMALE   AGED0TO16     MIXED
+## 31.1  31 FEMALE  AGED46TO64     WHITE
+## 2.1    2   MALE   AGED0TO16     MIXED
+## 26.2  26 FEMALE  AGED17TO45     WHITE
+## 4.1    4   MALE   AGED0TO16     BLACK
+## 37.4  37 FEMALE AGED65OLDER     MIXED
+## 10.1  10   MALE  AGED17TO45     OTHER
+## 29.14 29 FEMALE  AGED17TO45     BLACK
+## 25    25 FEMALE   AGED0TO16     OTHER
+## 27.14 27 FEMALE  AGED17TO45     MIXED
+## 36    36 FEMALE AGED65OLDER     WHITE
+## 39.4  39 FEMALE AGED65OLDER     BLACK
+## 14.5  14   MALE  AGED46TO64     BLACK
+## 16    16   MALE AGED65OLDER     WHITE
+## 24.2  24 FEMALE   AGED0TO16     BLACK
+## 18.10 18   MALE AGED65OLDER     ASIAN
+## 23.11 23 FEMALE   AGED0TO16     ASIAN
+## 1      1   MALE   AGED0TO16     WHITE
+## 
+## [[3]]
+##       ID GENDER         AGE ETHNICITY
+## 2      2   MALE   AGED0TO16     MIXED
+## 3      3   MALE   AGED0TO16     ASIAN
+## 3.1    3   MALE   AGED0TO16     ASIAN
+## 3.2    3   MALE   AGED0TO16     ASIAN
+## 3.3    3   MALE   AGED0TO16     ASIAN
+## 4      4   MALE   AGED0TO16     BLACK
+## 6      6   MALE  AGED17TO45     WHITE
+## 6.1    6   MALE  AGED17TO45     WHITE
+## 6.2    6   MALE  AGED17TO45     WHITE
+## 6.3    6   MALE  AGED17TO45     WHITE
+## 6.4    6   MALE  AGED17TO45     WHITE
+## 6.5    6   MALE  AGED17TO45     WHITE
+## 6.6    6   MALE  AGED17TO45     WHITE
+## 7      7   MALE  AGED17TO45     MIXED
+## 7.1    7   MALE  AGED17TO45     MIXED
+## 7.2    7   MALE  AGED17TO45     MIXED
+## 7.3    7   MALE  AGED17TO45     MIXED
+## 7.4    7   MALE  AGED17TO45     MIXED
+## 7.5    7   MALE  AGED17TO45     MIXED
+## 7.6    7   MALE  AGED17TO45     MIXED
+## 7.7    7   MALE  AGED17TO45     MIXED
+## 7.8    7   MALE  AGED17TO45     MIXED
+## 8      8   MALE  AGED17TO45     ASIAN
+## 8.1    8   MALE  AGED17TO45     ASIAN
+## 8.2    8   MALE  AGED17TO45     ASIAN
+## 8.3    8   MALE  AGED17TO45     ASIAN
+## 8.4    8   MALE  AGED17TO45     ASIAN
+## 8.5    8   MALE  AGED17TO45     ASIAN
+## 8.6    8   MALE  AGED17TO45     ASIAN
+## 8.7    8   MALE  AGED17TO45     ASIAN
+## 8.8    8   MALE  AGED17TO45     ASIAN
+## 8.9    8   MALE  AGED17TO45     ASIAN
+## 8.10   8   MALE  AGED17TO45     ASIAN
+## 8.11   8   MALE  AGED17TO45     ASIAN
+## 8.12   8   MALE  AGED17TO45     ASIAN
+## 8.13   8   MALE  AGED17TO45     ASIAN
+## 8.14   8   MALE  AGED17TO45     ASIAN
+## 8.15   8   MALE  AGED17TO45     ASIAN
+## 8.16   8   MALE  AGED17TO45     ASIAN
+## 8.17   8   MALE  AGED17TO45     ASIAN
+## 8.18   8   MALE  AGED17TO45     ASIAN
+## 8.19   8   MALE  AGED17TO45     ASIAN
+## 8.20   8   MALE  AGED17TO45     ASIAN
+## 8.21   8   MALE  AGED17TO45     ASIAN
+## 8.22   8   MALE  AGED17TO45     ASIAN
+## 8.23   8   MALE  AGED17TO45     ASIAN
+## 8.24   8   MALE  AGED17TO45     ASIAN
+## 8.25   8   MALE  AGED17TO45     ASIAN
+## 8.26   8   MALE  AGED17TO45     ASIAN
+## 8.27   8   MALE  AGED17TO45     ASIAN
+## 8.28   8   MALE  AGED17TO45     ASIAN
+## 8.29   8   MALE  AGED17TO45     ASIAN
+## 8.30   8   MALE  AGED17TO45     ASIAN
+## 8.31   8   MALE  AGED17TO45     ASIAN
+## 8.32   8   MALE  AGED17TO45     ASIAN
+## 8.33   8   MALE  AGED17TO45     ASIAN
+## 8.34   8   MALE  AGED17TO45     ASIAN
+## 8.35   8   MALE  AGED17TO45     ASIAN
+## 8.36   8   MALE  AGED17TO45     ASIAN
+## 9      9   MALE  AGED17TO45     BLACK
+## 9.1    9   MALE  AGED17TO45     BLACK
+## 9.2    9   MALE  AGED17TO45     BLACK
+## 9.3    9   MALE  AGED17TO45     BLACK
+## 9.4    9   MALE  AGED17TO45     BLACK
+## 9.5    9   MALE  AGED17TO45     BLACK
+## 9.6    9   MALE  AGED17TO45     BLACK
+## 9.7    9   MALE  AGED17TO45     BLACK
+## 9.8    9   MALE  AGED17TO45     BLACK
+## 10    10   MALE  AGED17TO45     OTHER
+## 10.1  10   MALE  AGED17TO45     OTHER
+## 11    11   MALE  AGED46TO64     WHITE
+## 11.1  11   MALE  AGED46TO64     WHITE
+## 12    12   MALE  AGED46TO64     MIXED
+## 12.1  12   MALE  AGED46TO64     MIXED
+## 12.2  12   MALE  AGED46TO64     MIXED
+## 13    13   MALE  AGED46TO64     ASIAN
+## 13.1  13   MALE  AGED46TO64     ASIAN
+## 13.2  13   MALE  AGED46TO64     ASIAN
+## 13.3  13   MALE  AGED46TO64     ASIAN
+## 13.4  13   MALE  AGED46TO64     ASIAN
+## 13.5  13   MALE  AGED46TO64     ASIAN
+## 13.6  13   MALE  AGED46TO64     ASIAN
+## 13.7  13   MALE  AGED46TO64     ASIAN
+## 13.8  13   MALE  AGED46TO64     ASIAN
+## 13.9  13   MALE  AGED46TO64     ASIAN
+## 13.10 13   MALE  AGED46TO64     ASIAN
+## 13.11 13   MALE  AGED46TO64     ASIAN
+## 14    14   MALE  AGED46TO64     BLACK
+## 14.1  14   MALE  AGED46TO64     BLACK
+## 14.2  14   MALE  AGED46TO64     BLACK
+## 16    16   MALE AGED65OLDER     WHITE
+## 16.1  16   MALE AGED65OLDER     WHITE
+## 17    17   MALE AGED65OLDER     MIXED
+## 17.1  17   MALE AGED65OLDER     MIXED
+## 17.2  17   MALE AGED65OLDER     MIXED
+## 18    18   MALE AGED65OLDER     ASIAN
+## 18.1  18   MALE AGED65OLDER     ASIAN
+## 18.2  18   MALE AGED65OLDER     ASIAN
+## 18.3  18   MALE AGED65OLDER     ASIAN
+## 18.4  18   MALE AGED65OLDER     ASIAN
+## 18.5  18   MALE AGED65OLDER     ASIAN
+## 18.6  18   MALE AGED65OLDER     ASIAN
+## 18.7  18   MALE AGED65OLDER     ASIAN
+## 18.8  18   MALE AGED65OLDER     ASIAN
+## 18.9  18   MALE AGED65OLDER     ASIAN
+## 18.10 18   MALE AGED65OLDER     ASIAN
+## 18.11 18   MALE AGED65OLDER     ASIAN
+## 19    19   MALE AGED65OLDER     BLACK
+## 19.1  19   MALE AGED65OLDER     BLACK
+## 19.2  19   MALE AGED65OLDER     BLACK
+## 21    21 FEMALE   AGED0TO16     WHITE
+## 22    22 FEMALE   AGED0TO16     MIXED
+## 23    23 FEMALE   AGED0TO16     ASIAN
+## 23.1  23 FEMALE   AGED0TO16     ASIAN
+## 23.2  23 FEMALE   AGED0TO16     ASIAN
+## 23.3  23 FEMALE   AGED0TO16     ASIAN
+## 23.4  23 FEMALE   AGED0TO16     ASIAN
+## 23.5  23 FEMALE   AGED0TO16     ASIAN
+## 24    24 FEMALE   AGED0TO16     BLACK
+## 26    26 FEMALE  AGED17TO45     WHITE
+## 26.1  26 FEMALE  AGED17TO45     WHITE
+## 26.2  26 FEMALE  AGED17TO45     WHITE
+## 26.3  26 FEMALE  AGED17TO45     WHITE
+## 26.4  26 FEMALE  AGED17TO45     WHITE
+## 26.5  26 FEMALE  AGED17TO45     WHITE
+## 26.6  26 FEMALE  AGED17TO45     WHITE
+## 26.7  26 FEMALE  AGED17TO45     WHITE
+## 26.8  26 FEMALE  AGED17TO45     WHITE
+## 27    27 FEMALE  AGED17TO45     MIXED
+## 27.1  27 FEMALE  AGED17TO45     MIXED
+## 27.2  27 FEMALE  AGED17TO45     MIXED
+## 27.3  27 FEMALE  AGED17TO45     MIXED
+## 27.4  27 FEMALE  AGED17TO45     MIXED
+## 27.5  27 FEMALE  AGED17TO45     MIXED
+## 27.6  27 FEMALE  AGED17TO45     MIXED
+## 27.7  27 FEMALE  AGED17TO45     MIXED
+## 27.8  27 FEMALE  AGED17TO45     MIXED
+## 27.9  27 FEMALE  AGED17TO45     MIXED
+## 27.10 27 FEMALE  AGED17TO45     MIXED
+## 27.11 27 FEMALE  AGED17TO45     MIXED
+## 28    28 FEMALE  AGED17TO45     ASIAN
+## 28.1  28 FEMALE  AGED17TO45     ASIAN
+## 28.2  28 FEMALE  AGED17TO45     ASIAN
+## 28.3  28 FEMALE  AGED17TO45     ASIAN
+## 28.4  28 FEMALE  AGED17TO45     ASIAN
+## 28.5  28 FEMALE  AGED17TO45     ASIAN
+## 28.6  28 FEMALE  AGED17TO45     ASIAN
+## 28.7  28 FEMALE  AGED17TO45     ASIAN
+## 28.8  28 FEMALE  AGED17TO45     ASIAN
+## 28.9  28 FEMALE  AGED17TO45     ASIAN
+## 28.10 28 FEMALE  AGED17TO45     ASIAN
+## 28.11 28 FEMALE  AGED17TO45     ASIAN
+## 28.12 28 FEMALE  AGED17TO45     ASIAN
+## 28.13 28 FEMALE  AGED17TO45     ASIAN
+## 28.14 28 FEMALE  AGED17TO45     ASIAN
+## 28.15 28 FEMALE  AGED17TO45     ASIAN
+## 28.16 28 FEMALE  AGED17TO45     ASIAN
+## 28.17 28 FEMALE  AGED17TO45     ASIAN
+## 28.18 28 FEMALE  AGED17TO45     ASIAN
+## 28.19 28 FEMALE  AGED17TO45     ASIAN
+## 28.20 28 FEMALE  AGED17TO45     ASIAN
+## 28.21 28 FEMALE  AGED17TO45     ASIAN
+## 28.22 28 FEMALE  AGED17TO45     ASIAN
+## 28.23 28 FEMALE  AGED17TO45     ASIAN
+## 28.24 28 FEMALE  AGED17TO45     ASIAN
+## 28.25 28 FEMALE  AGED17TO45     ASIAN
+## 28.26 28 FEMALE  AGED17TO45     ASIAN
+## 28.27 28 FEMALE  AGED17TO45     ASIAN
+## 28.28 28 FEMALE  AGED17TO45     ASIAN
+## 28.29 28 FEMALE  AGED17TO45     ASIAN
+## 28.30 28 FEMALE  AGED17TO45     ASIAN
+## 28.31 28 FEMALE  AGED17TO45     ASIAN
+## 28.32 28 FEMALE  AGED17TO45     ASIAN
+## 28.33 28 FEMALE  AGED17TO45     ASIAN
+## 28.34 28 FEMALE  AGED17TO45     ASIAN
+## 28.35 28 FEMALE  AGED17TO45     ASIAN
+## 28.36 28 FEMALE  AGED17TO45     ASIAN
+## 28.37 28 FEMALE  AGED17TO45     ASIAN
+## 28.38 28 FEMALE  AGED17TO45     ASIAN
+## 28.39 28 FEMALE  AGED17TO45     ASIAN
+## 28.40 28 FEMALE  AGED17TO45     ASIAN
+## 28.41 28 FEMALE  AGED17TO45     ASIAN
+## 28.42 28 FEMALE  AGED17TO45     ASIAN
+## 28.43 28 FEMALE  AGED17TO45     ASIAN
+## 28.44 28 FEMALE  AGED17TO45     ASIAN
+## 28.45 28 FEMALE  AGED17TO45     ASIAN
+## 29    29 FEMALE  AGED17TO45     BLACK
+## 29.1  29 FEMALE  AGED17TO45     BLACK
+## 29.2  29 FEMALE  AGED17TO45     BLACK
+## 29.3  29 FEMALE  AGED17TO45     BLACK
+## 29.4  29 FEMALE  AGED17TO45     BLACK
+## 29.5  29 FEMALE  AGED17TO45     BLACK
+## 29.6  29 FEMALE  AGED17TO45     BLACK
+## 29.7  29 FEMALE  AGED17TO45     BLACK
+## 29.8  29 FEMALE  AGED17TO45     BLACK
+## 29.9  29 FEMALE  AGED17TO45     BLACK
+## 29.10 29 FEMALE  AGED17TO45     BLACK
+## 29.11 29 FEMALE  AGED17TO45     BLACK
+## 30    30 FEMALE  AGED17TO45     OTHER
+## 30.1  30 FEMALE  AGED17TO45     OTHER
+## 30.2  30 FEMALE  AGED17TO45     OTHER
+## 31    31 FEMALE  AGED46TO64     WHITE
+## 31.1  31 FEMALE  AGED46TO64     WHITE
+## 31.2  31 FEMALE  AGED46TO64     WHITE
+## 32    32 FEMALE  AGED46TO64     MIXED
+## 32.1  32 FEMALE  AGED46TO64     MIXED
+## 32.2  32 FEMALE  AGED46TO64     MIXED
+## 32.3  32 FEMALE  AGED46TO64     MIXED
+## 33    33 FEMALE  AGED46TO64     ASIAN
+## 33.1  33 FEMALE  AGED46TO64     ASIAN
+## 33.2  33 FEMALE  AGED46TO64     ASIAN
+## 33.3  33 FEMALE  AGED46TO64     ASIAN
+## 33.4  33 FEMALE  AGED46TO64     ASIAN
+## 33.5  33 FEMALE  AGED46TO64     ASIAN
+## 33.6  33 FEMALE  AGED46TO64     ASIAN
+## 33.7  33 FEMALE  AGED46TO64     ASIAN
+## 33.8  33 FEMALE  AGED46TO64     ASIAN
+## 33.9  33 FEMALE  AGED46TO64     ASIAN
+## 33.10 33 FEMALE  AGED46TO64     ASIAN
+## 33.11 33 FEMALE  AGED46TO64     ASIAN
+## 33.12 33 FEMALE  AGED46TO64     ASIAN
+## 33.13 33 FEMALE  AGED46TO64     ASIAN
+## 33.14 33 FEMALE  AGED46TO64     ASIAN
+## 34    34 FEMALE  AGED46TO64     BLACK
+## 34.1  34 FEMALE  AGED46TO64     BLACK
+## 34.2  34 FEMALE  AGED46TO64     BLACK
+## 34.3  34 FEMALE  AGED46TO64     BLACK
+## 35    35 FEMALE  AGED46TO64     OTHER
+## 36    36 FEMALE AGED65OLDER     WHITE
+## 36.1  36 FEMALE AGED65OLDER     WHITE
+## 36.2  36 FEMALE AGED65OLDER     WHITE
+## 37    37 FEMALE AGED65OLDER     MIXED
+## 37.1  37 FEMALE AGED65OLDER     MIXED
+## 37.2  37 FEMALE AGED65OLDER     MIXED
+## 37.3  37 FEMALE AGED65OLDER     MIXED
+## 38    38 FEMALE AGED65OLDER     ASIAN
+## 38.1  38 FEMALE AGED65OLDER     ASIAN
+## 38.2  38 FEMALE AGED65OLDER     ASIAN
+## 38.3  38 FEMALE AGED65OLDER     ASIAN
+## 38.4  38 FEMALE AGED65OLDER     ASIAN
+## 38.5  38 FEMALE AGED65OLDER     ASIAN
+## 38.6  38 FEMALE AGED65OLDER     ASIAN
+## 38.7  38 FEMALE AGED65OLDER     ASIAN
+## 38.8  38 FEMALE AGED65OLDER     ASIAN
+## 38.9  38 FEMALE AGED65OLDER     ASIAN
+## 38.10 38 FEMALE AGED65OLDER     ASIAN
+## 38.11 38 FEMALE AGED65OLDER     ASIAN
+## 38.12 38 FEMALE AGED65OLDER     ASIAN
+## 38.13 38 FEMALE AGED65OLDER     ASIAN
+## 38.14 38 FEMALE AGED65OLDER     ASIAN
+## 39    39 FEMALE AGED65OLDER     BLACK
+## 39.1  39 FEMALE AGED65OLDER     BLACK
+## 39.2  39 FEMALE AGED65OLDER     BLACK
+## 39.3  39 FEMALE AGED65OLDER     BLACK
+## 40    40 FEMALE AGED65OLDER     OTHER
+## 6.7    6   MALE  AGED17TO45     WHITE
+## 2.1    2   MALE   AGED0TO16     MIXED
+## 10.2  10   MALE  AGED17TO45     OTHER
+## 16.2  16   MALE AGED65OLDER     WHITE
+## 28.46 28 FEMALE  AGED17TO45     ASIAN
+## 1      1   MALE   AGED0TO16     WHITE
+## 11.2  11   MALE  AGED46TO64     WHITE
+## 5      5   MALE   AGED0TO16     OTHER
+## 18.12 18   MALE AGED65OLDER     ASIAN
+## 22.1  22 FEMALE   AGED0TO16     MIXED
+## 26.9  26 FEMALE  AGED17TO45     WHITE
+## 24.1  24 FEMALE   AGED0TO16     BLACK
+## 9.9    9   MALE  AGED17TO45     BLACK
+## 3.4    3   MALE   AGED0TO16     ASIAN
+## 7.9    7   MALE  AGED17TO45     MIXED
+</code></pre>
+
+<h2>Rearranging the output into a single data frame</h2>
+
+<p>For ease of analysis, it is best to have all the output
+individuals in a single data frame, with a new column added to show which
+zone they belong to:</p>
+
+<pre><code class="r">intall.df &lt;- cbind(intall[[1]], zone = 1)
+head(intall.df)
+</code></pre>
+
+<pre><code>##     ID GENDER       AGE ETHNICITY zone
+## 1    1   MALE AGED0TO16     WHITE    1
+## 2    2   MALE AGED0TO16     MIXED    1
+## 3    3   MALE AGED0TO16     ASIAN    1
+## 3.1  3   MALE AGED0TO16     ASIAN    1
+## 3.2  3   MALE AGED0TO16     ASIAN    1
+## 3.3  3   MALE AGED0TO16     ASIAN    1
+</code></pre>
+
+<pre><code class="r">for (i in 2:nrow(cons)) {
+    # run for all zones with 1:length(intall)
+    intall.df &lt;- rbind(intall.df, cbind(intall[[i]], zone = i))
+}
+summary(intall.df[intall.df$zone == 1, ])  # test the output
+</code></pre>
+
+<pre><code>##        ID          GENDER             AGE      ETHNICITY        zone  
+##  Min.   : 1.0   FEMALE:102   AGED0TO16  : 50   ASIAN:199   Min.   :1  
+##  1st Qu.: 8.0   MALE  :148   AGED17TO45 :101   BLACK:  9   1st Qu.:1  
+##  Median :13.0                AGED46TO64 : 79   MIXED: 11   Median :1  
+##  Mean   :17.6                AGED65OLDER: 20   OTHER: 20   Mean   :1  
+##  3rd Qu.:28.0                                  WHITE: 11   3rd Qu.:1  
+##  Max.   :38.0                                              Max.   :1
+</code></pre>
+
+<pre><code class="r">summary(intall.df[intall.df$zone == 3, ])  # test the output
+</code></pre>
+
+<pre><code>##        ID          GENDER             AGE      ETHNICITY        zone  
+##  Min.   : 1.0   FEMALE:149   AGED0TO16  : 21   ASIAN:150   Min.   :3  
+##  1st Qu.: 9.0   MALE  :121   AGED17TO45 :152   BLACK: 39   1st Qu.:3  
+##  Median :26.0                AGED46TO64 : 48   MIXED: 40   Median :3  
+##  Mean   :21.2                AGED65OLDER: 49   OTHER:  9   Mean   :3  
+##  3rd Qu.:29.0                                  WHITE: 32   3rd Qu.:3  
+##  Max.   :40.0                                              Max.   :3
+</code></pre>
+
+<pre><code class="r">summary(intall.df)
+</code></pre>
+
+<pre><code>##        ID          GENDER             AGE      ETHNICITY        zone     
+##  Min.   : 1.0   FEMALE:450   AGED0TO16  :103   ASIAN:548   Min.   :1.00  
+##  1st Qu.: 9.0   MALE  :390   AGED17TO45 :401   BLACK:100   1st Qu.:1.00  
+##  Median :23.0                AGED46TO64 :221   MIXED:101   Median :2.00  
+##  Mean   :20.8                AGED65OLDER:115   OTHER: 38   Mean   :2.02  
+##  3rd Qu.:29.0                                  WHITE: 53   3rd Qu.:3.00  
+##  Max.   :40.0                                              Max.   :3.00
+</code></pre>
+
+<h2>The impact of integerisation on model fit</h2>
+
+<p>Integerisation usually introduces some error. Let&#39;s see how much:</p>
+
+<pre><code class="r">cor(as.numeric(as.matrix(intagg)), as.numeric(as.matrix(cons)))
+</code></pre>
+
+<pre><code>## [1] 0.9998
+</code></pre>
+
+<p>The answer is NOT A LOT! The integerisation strategy is good at selecting
+appropriate individuals for each zone.</p>
+
+</body>
+
+</html>
+
