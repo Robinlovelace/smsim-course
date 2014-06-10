@@ -77,7 +77,7 @@ set.seed(0) # Include this line to ensure repeatable results
 for (i in 1:nrow(cons)){
   if(max(f[,i]) == 0) f[which.max(fw[,i]),i] <- 1 # ensures model will run in case max(i5.w5 < 1) thanks to Eveline van Leeuwen
   ints[[i]] <- rep(which(fw[,i] > 0), f[,i])
-  s <- sample(which(fw[,i] > 0), size = sum(con1[i,]) - sum(f[,i]) , # sample using decimal weights to 'top up' selection
+  s <- sample(which(fw[,i] >= 0), size = sum(con1[i,]) - sum(f[,i]) , # sample using decimal weights to 'top up' selection
               prob=d[,i], replace = F) 
   ints[[i]] <- c(ints[[i]], s) # add the sampled population to the one selected from truncated weights
   intall[[i]] <- ind[ints[[i]],] # Pulls all other data from index

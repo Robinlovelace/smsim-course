@@ -62,22 +62,57 @@
 \tableofcontents
 
 \chapter{Preface}
-This booklet was written to accompany a two day course of the same title.
-As well as providing useful information to the $\approx$30 participants during
-and after the course, it is hoped that the material will be of use to others.
+The trigger for this book's creation was a two day course, An
+Introduction to Spatial Microsimulation with R, held at the University
+of Leeds in the spring of 2014. Based on the high demand before the course
+and feedback from participants taking part, it seemed there was a
+definite need for more practical teaching material on spatial microsimulation
+than was available at the time: many people had read the literature and had
+a good idea about the problem that they wanted to harness the method to solve.
+Yet the majority were dissatisfied with the \emph{practical} content of existing
+work, or lack thereof.
 
-\chapter{Introduction}
+This book is for all those struggling to find material clearly and succinctly
+explaining how to implement spatial microsimulation on their own
+datasets.
 
+The underlying motivations for this work go much deeper and are best understood with
+reference to my own experience of trying to learn spatial microsimulation. I, like many PhD students
+and researchers, was tasked with implementing the method when it was almost completely new to me.
+I had barely heard of the method, let alone understood the methodology.
+The first stage was to read up on what spatial microsimulation
+actually was: in this area I was fortunate enough to have good guidance from my
+supervisor Dimitris Ballas, who pointed me towards an accessible introduction to
+spatial microsimulation commissioned by the Joseph Roundtree Foundation \citep{Ballas2005b}.
+Without this text, I'd have been even more bewildered; overcoming this
+bewilderment is a central aim of this course. It will not demonstrate how,
+exactly, to apply the method to your own datasets, but it will provide strong
+foundations that should enable the method to be applied to almost any combination
+of individual and aggregate level datasets, provided suitable shared variables between the two.
+As emphasised in the closing chapter of the book, it is the responsibility of
+the researcher to ensure that the method is applied in a rigorous and ethical way:
+this cannot be taught, although the extensive CakeMap example will demonstrate how
+the method can be used in rather absurd ways.
 
-Spatial microsimulation is shrouded by an unnecessary mystery, and this is not
-helped by the fact that most academic papers on subject and even some textbooks
-lack reproducible examples. In today's age of fast
+In addition to good guidance towards introductory reading, another major benefit
+I had was having Malcolm Campbell as my predecessor. Malcolm provided a huge amount of
+support during the early phase of my PhD and shared the entirety of the R code he developed
+to perform spatial microsimulation on his Scottish health data.
+Not only was the code invaluable to my efforts to build a spatial microsimulation model in
+R (some of the code in the book is probably his at some level), his example of collaboration
+and code sharing was truly inspirational. Thus this book owes as much to Malcolm as to anyone else
+and its free distribution under the Creative Commons license is partly a result of his
+generosity in sharing code and enthusiasm of teaching tricky statistical techniques.
+
+% \chapter{Introduction}
+\chapter{What is spatial microsimulation?}
+Spatial microsimulation is shrouded by an unnecessary mystery, and this is worsened
+by much of the literature on the subject. Most academic papers and even some textbooks
+about spatial microsimulation lack reproducible examples. In today's age of fast
 Internet connections, open access datasets and free software,
 things need not be this way. One could argue that the lack of
 reproducibility in spatial microsimulation is damaging to the growth
 and credibility of the field.
-
-
 
 To those doubting the value of this practical approach, I ask the following
 questions: If only a small community of researchers hold the majority of the
@@ -114,6 +149,10 @@ The examples presented below were developed during a PhD project in the energy
 costs of commuting. Although some of the code and most of the descriptive text
 has been rewritten since then, many of the ideas and methods are described in
 more detail in the resulting thesis.% \citep{Lovelace2014-thesis}.
+
+\chapter{Applications}
+
+\chapter{Spatial microsimulation with R}
 
 \section{Why R?} \label{setsim} % Move this to just before R implementation?
 
@@ -757,6 +796,11 @@ done on this code are important to ensure the model is understood
 at all times and is working correctly. More systematic methods
 for model checking are the topic of the following section.
 
+\chapter{Customising code: a worked example with CakeMap data}
+
+
+\chapter{The Flexible Modelling Framework (FMF)}
+
 \section{Model checking and validation} \label{smeval}
 
 To make an analogy with food safety standards, openness about mistakes is
@@ -1139,7 +1183,6 @@ to be from the same population. However, the raw results of IPF are not
 conducive to such tests at the individual level because they do not contain
 whole individuals. Integerisation of the weight matrices is needed.
 
-
 \section{Integerisation} \index{integerisation}
 A question raised by this research is this: How do integerised IPF results
 compare with other (e.g. combinatorial optimisation) approaches to spatial
@@ -1149,6 +1192,10 @@ alternative approaches \citep{harland2012}, but not like-with-like.
 
 \section{Extensions to the basic model}
 \label{discuss}
+
+\chapter{Spatial microdata inputs into agent based models}
+
+\chapter{Conclusions and further resources}
 
 \section{Acknowledgements}
 

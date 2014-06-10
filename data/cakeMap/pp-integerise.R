@@ -12,7 +12,7 @@ set.seed(0) # Include this line to ensure repeatable results
 
 # Sample individuals based on their proportional probabilities
 for (i in 1:nrow(cons)){
-  ints[[i]] <- sample(which(fw[,i] > 0), size = sum(con1[i,]), 
+  ints[[i]] <- sample(which(fw[,i] >= 0), size = sum(con1[i,]), 
                       prob=fw[,i], replace = T) 
   intall[[i]] <- ind[ints[[i]],] # Pulls all other data from index
   source("data/cakeMap/area.cat.R") # save the aggregate data
