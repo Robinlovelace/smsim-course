@@ -42,3 +42,10 @@ qplot(data = iam, x = Census, y = Simulated, color = Constraint) +
   theme_bw() + facet_wrap( ~ Cons , ncol = 2) # plot the figure for all constraints
 
 ggsave("figures/ipf-graph.png")
+
+io <- iam[ iam$Cons ==4, ]
+io$ta <- abs(io$Simulated - io$Census)
+io[io$ta > 1000,]
+
+cons[7,]
+cons[ cons$Other > 10000, ]

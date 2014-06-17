@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 \contentsline {chapter}{\numberline {1}Preface}{7}{chapter.1}
 \contentsline {chapter}{\numberline {2}Introduction}{9}{chapter.2}
 \contentsline {section}{\numberline {2.1}Why R?}{11}{section.2.1}
@@ -40,5 +41,25 @@
 \contentsline {section}{\numberline {8.4}Spatial microdata: an input into agent based models}{26}{section.8.4}
 \contentsline {chapter}{\numberline {9}Conclusions and a peak into the future}{27}{chapter.9}
 \contentsline {chapter}{\numberline {10}Bibliography}{29}{chapter.10}
+=======
+\contentsline {chapter}{\numberline {1}Preface}{5}{chapter.1}
+\contentsline {chapter}{\numberline {2}What is spatial microsimulation?}{9}{chapter.2}
+\contentsline {chapter}{\numberline {3}Applications}{13}{chapter.3}
+\contentsline {chapter}{\numberline {4}Spatial microsimulation with R}{15}{chapter.4}
+\contentsline {section}{\numberline {4.1}Why R?}{15}{section.4.1}
+\contentsline {section}{\numberline {4.2}IPF theory: a worked example}{17}{section.4.2}
+\contentsline {section}{\numberline {4.3}Implementing IPF in R}{24}{section.4.3}
+\contentsline {chapter}{\numberline {5}Customising code: a worked example with CakeMap data}{41}{chapter.5}
+\contentsline {chapter}{\numberline {6}The Flexible Modelling Framework (FMF)}{43}{chapter.6}
+\contentsline {section}{\numberline {6.1}Model checking and validation}{43}{section.6.1}
+\contentsline {subsection}{\numberline {6.1.1}Model checking}{44}{subsection.6.1.1}
+\contentsline {subsection}{\numberline {6.1.2}Model validation}{47}{subsection.6.1.2}
+\contentsline {subsection}{\numberline {6.1.3}Additional validation methods}{54}{subsection.6.1.3}
+\contentsline {section}{\numberline {6.2}Integerisation}{56}{section.6.2}
+\contentsline {section}{\numberline {6.3}Extensions to the basic model}{56}{section.6.3}
+\contentsline {chapter}{\numberline {7}Spatial microdata inputs into agent based models}{63}{chapter.7}
+\contentsline {chapter}{\numberline {8}Conclusions and further resources}{65}{chapter.8}
+\contentsline {section}{\numberline {8.1}Acknowledgements}{65}{section.8.1}
+>>>>>>> 5621fcd28636b3e0bc6e52374ed365f16f97b5ad
 \vspace {2em}
 \contentsline {chapter}{Index}{32}{section*.3}
