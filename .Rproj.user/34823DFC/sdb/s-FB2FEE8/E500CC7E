@@ -1,0 +1,17 @@
+{
+    "contents" : "############################################\n#### From the IPF-performance-testing github repo  \n#### https://github.com/Robinlovelace/IPF-performance-testing\n############################################\n\nind <- read.csv(\"data/simple/ind.csv\") # load the individual level data\ncons <- read.csv(\"data/simple/cons.csv\") # load aggregate constraints\n\ncon1 <- cons[,1:2]\ncon2 <- cons[,3:4]\n# inspect the data we have loaded\nind[1,]\ncons[1:2,]\n\nsource(\"data/simple/categorise.R\") # categorise the individual level variable\nind.cat # take a look at the output\ncolSums(ind.cat)\n\n# create weight object and aggregated individual-level data\nweights <- array(1, dim=c(nrow(ind),nrow(cons))) \nind.agg <- matrix (rep(colSums ( ind.cat ) , nrow (cons)) , nrow (cons), byrow = T )\n\n## total absolute error \nsum(abs(ind.agg - cons)) # the total absolute error \nsum(abs(ind.agg[1,] - cons[1,])) ## total absolute error for zone 1\n\n############## The IPF part #############\n\n# Re-weighting for constraint 1 via IPF \nfor (j in 1:nrow(cons)){\n  for(i in 1:ncol(con1)){\n weights[which(ind.cat[,i] == 1),j] <- cons[j,i] / ind.agg[j,i]}}\n\nfor (i in 1:nrow(cons)){ # convert con1 weights back into aggregates\n  ind.agg[i,]   <- colSums(ind.cat * weights[,i])}\n\nind.agg[1, ] # check the new aggregate values for zone 1\n\n# test results for first row (not necessary for model)\nind.agg[1,] - cons[1,]\nsum(abs(ind.agg - cons)) ## the total absolute error \nsum(abs(ind.agg[1,] - cons[1,])) # total absolute error for zone 1\n\nweights2 <- weights # save weights 2\n\n# Re-weighting for constraint 2 via IPF \nfor (j in 1:nrow(cons)){\n   for(i in 1:ncol(con2) + ncol(con1)){\n weights[which(ind.cat[,i] == 1),j] <- cons[j,i] / ind.agg[j,i]}}\n\nfor (i in 1:nrow(cons)){ # convert con1 weights back into aggregates\n  weights[,i] <- weights[,i] * weights2[,i]\n  ind.agg[i,]   <- colSums(ind.cat * weights[,i])}\nweights3 <- weights\n\nind.agg[1,] - cons[1,]\nsum(abs(ind.agg - cons)) # the total absolute error \nsum(abs(ind.agg[1,] - cons[1,])) # total absolute error for zone 1\nweights3[,1] # check the weights allocated for zone 1\n",
+    "created" : 1399546677239.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3737867879",
+    "id" : "E500CC7E",
+    "lastKnownWriteTime" : 1409929000,
+    "path" : "~/repos/smsim-course/simple.R",
+    "project_path" : "simple.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}
