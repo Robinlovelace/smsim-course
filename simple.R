@@ -12,17 +12,13 @@ con2 <- cons[,3:4]
 ind[1,]
 cons[1:2,]
 
-colSums()
-
 source("data/simple/categorise.R") # categorise the individual level variable
 ind.cat # take a look at the output
-
 colSums(ind.cat)
 
 # create weight object and aggregated individual-level data
 weights <- array(1, dim=c(nrow(ind),nrow(cons))) 
-for (i in 1:nrow(cons)){ # 
-  ind.agg[i,]   <- colSums(ind.cat * weights[,i])}
+ind.agg <- matrix (rep(colSums ( ind.cat ) , nrow (cons)) , nrow (cons), byrow = T )
 
 ## total absolute error 
 sum(abs(ind.agg - cons)) # the total absolute error 

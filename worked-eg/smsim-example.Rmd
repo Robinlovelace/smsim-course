@@ -11,13 +11,13 @@ The first stage is to load the input data, from an Excel spreadsheet in this cas
 ```{r}
 # install.packages("gdata") # install gdata package if not already installed
 library(gdata) # load package for reading data
-ind <- read.xls("msim.xlsx", sheet="SAMPLING")
+ind <- read.xls("worked-eg/msim.xlsx", sheet="SAMPLING")
 head(ind)
 
 # load the constraints and check the totals add up
-con1 <- read.xls("msim.xlsx", "GENDER")[-1]; sum(con1)
-con2 <- read.xls("msim.xlsx", "AGE")[-1]; sum(con2)
-con3 <- read.xls("msim.xlsx", "ETHNICITY")[-1]; sum(con3)
+con1 <- read.xls("worked-eg/msim.xlsx", "GENDER")[-1]; sum(con1)
+con2 <- read.xls("worked-eg/msim.xlsx", "AGE")[-1]; sum(con2)
+con3 <- read.xls("worked-eg/msim.xlsx", "ETHNICITY")[-1]; sum(con3)
 num.cons <- 3  # n. constraints - can set automatically: length(which(grepl("con[1-9]",ls()))))
 cons <- cbind(con1, con2, con3)
 cat.names <- names(cons)
@@ -136,6 +136,7 @@ set.seed(0) # Include this line to ensure repeatable results
 ```
 
 ## Integerisation loop
+
 Here we sample individuals based on their weights.
 This is the Truncate Replicate Sample (TRS) method described by
 Lovelace and Ballas (2011).
@@ -148,7 +149,7 @@ for (i in 1:nrow(cons)){
               prob=d[,i], replace = F) 
   ints[[i]] <- c(ints[[i]], s) # add the sampled population to the one selected from truncated weights
   intall[[i]] <- ind[ints[[i]],] # Pulls all other data from index
-  source("areaCat.R") # save the aggregate data
+  source("worked-eg/areaCat.R") # save the aggregate data
   intagg[i,] <- colSums(area.cat) 
 }
 ```
@@ -168,6 +169,8 @@ individuals in a single data frame, with a new column added to show which
 zone they belong to:
 
 ```{r}
+do.call(rbind, )
+
 intall.df <- cbind(intall[[1]], zone = 1)
 head(intall.df)
 for(i in 2:nrow(cons)){ # run for all zones with 1:length(intall)
