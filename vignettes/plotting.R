@@ -25,7 +25,7 @@ library(ggplot2) # for nice plots
 qplot(cons.melted[,2], ind.agg.melted[,3], color = con.long.names, alpha = 0.5) + theme_bw()
 
 # create data for entire iteration
-iam <- melt(indf[,,,1,1]) # provide shortened names of those above
+iam <- melt(indf[,,,2,1]) # provide shortened names of those above
 head(iam)
 names(iam) <- c("Zone", "Category", "Cons", "Simulated")
 nrow(ind.agg.melted) / length(con.long.names) # how many constraints?

@@ -3,7 +3,7 @@
 #### https://github.com/Robinlovelace/IPF-performance-testing
 ############################################
 
-num.its <- 20 # how many iterations will we run?
+num.its <- 4 # how many iterations will we run?
 
 # Loading the data: Ensure R is in the right working directory 
 ind <- read.csv("data/cakeMap/ind.csv")

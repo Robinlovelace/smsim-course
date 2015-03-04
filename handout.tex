@@ -308,7 +308,7 @@ way to systematically compare individual level data with geographic aggregates.
 \centering
 \caption[Small area constraints expressed as marginal totals]{Small
 area constraints (matrix $s$) re-arranged to be the same dimension as $m$ (Table \ref{t:m}).
-``s'' here stands for Small area data or conStraint. Note only
+``s'' here stands for Small area data or constraint. Note only
 the marginal totals are known. The internal cell
 values (represented by ``?'') must be estimated by spatial microsimulation.
 }
@@ -749,7 +749,7 @@ reweighting the individuals to zones (\cref{lscreate}).
 \begin{lstlisting}[float=h, caption={Creating the weight and aggregated
 individual level matrices --- see lines 21 and 22 in `simple.R'}, label=lscreate]
 weights <- array(1, dim=c(nrow(ind),nrow(cons))) 
-ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons) )
+ind.agg <- matrix(rep(colSums(ind.cat), nrow(cons)), nrow(cons), byrow = T )
 \end{lstlisting}
 
 The code in \cref{lscreate} may not make total sense. Do not worry about this for now, you can always
