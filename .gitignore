@@ -1,0 +1,6 @@
+*.bbl
+*.idx
+.Rproj.user
+.Rproj.user/*
+.Rhistory
+.RData
