@@ -8,9 +8,17 @@ was set-up to act as the online home of a 1.5 day workshop dedicated to enable c
 understand and implement spatial microsimulation for their own purposes. 
 
 ## Introduction
+
 Spatial microsimulation is a statistical method by which individual-level data is generated for small areas by combining national surveys with geographically aggregated census data. Much has been written about the technique in academic journals, but there has been much less work explaining the practicalities of its implementation, generally, and its customisation for specific purposes.  Journal articles have tended to present key results, but not the underlying code, therefore hindering reproducibility. This day course aims to fill this knowledge gap.
 
-We take an explicitly practical and pragmatic approach to spatial microsimulation. By the end of the course attendees should be able to harness spatial microsimulation for their own needs by modifying the example code for their own datasets. To this end the course uses [R](http://www.r-project.org/), a free, open source and extensible statistical language.
+We take an explicitly practical and pragmatic approach to spatial microsimulation. By the end of the course attendees should be able to:
+
+- Understand what spatial microsimulation is and how it relates to 'population synthesis' and agent-based modelling (ABM)
+- Identify the problems that spatial microsimulation is well-suited to solving.
+- Decide between different software options and R packages for implementing spatial microsimulation.
+-  Harness spatial microsimulation for their own needs by modifying the example code for their own datasets.
+
+To this end the course uses [R](http://www.r-project.org/), a free, open source and extensible statistical language.
 
 No prior knowledge in either R or spatial microsimulation is assumed: we will begin from first principles, using simple examples to ensure understanding of every step. Content too will be directed to participants' needs; all teaching material will be provided with explanation of how to modify example code for tackling specific research problems.
 
